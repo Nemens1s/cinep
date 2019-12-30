@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+
+spring:
+  jackson:
+    default-property-inclusion: non_null
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:h2:~/testdb;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: test
+    password: test
+  h2:
+    console:
+      enabled: true
+app:
+  jwt:
+    secret: SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    durationMin: 60

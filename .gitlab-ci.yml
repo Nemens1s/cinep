@@ -1,0 +1,47 @@
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+  - chmod +x ./gradlew
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+build cinep:
+  stage: build
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+  artifacts:
+    paths:
+      - build/libs
+  tags:
+    - cinep-back
+  script:
+    - ./gradlew clean assemble --no-daemon
+  only:
+    refs:
+      - master
+
+test cinep:
+  stage: test
+  tags:
+    - cinep-back
+  script:
+    - ./gradlew check --stacktrace --no-daemon
+
+
+deploy cinep:
+  stage: deploy
+  tags:
+    - cinep-back
+  script:
+    - mkdir -p ~/api-deployment
+    - rm -rf ~/api-deployment/cinep-back.jar
+    - cp -r build/libs/. ~/api-deployment
+    - sudo service cinep restart
+  only:
+    refs:
+      - master
+
