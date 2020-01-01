@@ -102,17 +102,25 @@ public class SearchService {
     @Scheduled(cron = "0 0 * * * *")
     private void refreshDataBase() {
         List<Movie> movies = movieRepository.findAll();
-        logger.info("Started refreshing database, time is: "+LocalTime.now()+" Currently there are " + movies.size());
-        LocalTime localTime = LocalTime.now(ZoneId.of("Europe/Tallinn"));
-        List<Movie> result = movies.stream().filter(movie -> movie.getStartTime().isAfter(localTime)).collect(Collectors.toList());
-        movieRepository.deleteAll();
-        ratingService.updateRatings(result);
-        List<Rating> ratings = ratingsRepository.findAll();
-        Map<String, String> ratingsMap = new HashMap<>();
-        logger.info("There are " + ratingsMap.size() + " elements in ratings map");
-        ratings.forEach(rating -> ratingsMap.put(rating.getTitle(), rating.getRating()));
-        result.forEach(movie -> movie.setUserRating(ratingsMap.getOrDefault(movie.getOriginalTitle(), "Currently not available")));
-        logger.info("After refresh there are " + result.size() + " movies left: Current time is " + LocalTime.now());
-        movieRepository.saveAll(result);
+        logger.info("Started refreshing database, time is: "+LocalTime.now()+" Currently there are " + movies.size() + " movies");
+        if (movies.size() > 0){
+            LocalTime localTime = LocalTime.now(ZoneId.of("Europe/Tallinn"));
+            List<Movie> result = movies.stream().filter(movie -> movie.getStartTime().isAfter(localTime)).collect(Collectors.toList());
+            movieRepository.deleteAll();
+            ratingService.updateRatings(result);
+            List<Rating> ratings = ratingsRepository.findAll();
+            Map<String, String> ratingsMap = new HashMap<>();
+            ratings.forEach(rating -> ratingsMap.put(rating.getTitle(), rating.getRating()));
+            logger.info("There are " + ratingsMap.size() + " elements in ratings map");
+            result.forEach(movie -> movie.setUserRating(ratingsMap.getOrDefault(movie.getOriginalTitle(), "Currently not available")));
+            logger.info("After refresh there are " + result.size() + " movies left: Current time is " + LocalTime.now());
+            logger.info("FIRST MOVIE ID IS " + result.get(0).getId());
+            movieRepository.saveAll(result);
+            logger.info("FINISHED REFRESING DATABASE");
+        } else {
+            logger.info("There are no movies, skipping refresh");
+            getMoviesToDataBase();
+        }
+
     }
 }
