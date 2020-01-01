@@ -26,7 +26,7 @@ public class User {
 
     private String username;
 
-    @ElementCollection
+    @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(name = "user_bookmarks", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "movie_title")
     @JsonIgnore
