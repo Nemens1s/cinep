@@ -2,11 +2,12 @@ package cinep.app.cinep.service;
 
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.Rating;
-import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.RatingsRepository;
+import cinep.app.cinep.service.utilities.KeyConfig;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,20 +18,23 @@ import java.time.Year;
 import java.util.*;
 
 @Service
+@Setter
 public class RatingService {
 
-    private final String URL = "http://www.omdbapi.com/?apikey=99b14a7f&";
+    private KeyConfig config;
     private final RatingsRepository ratingsRepository;
 
     @Autowired
-    public RatingService(RatingsRepository ratingsRepository) {
+    public RatingService(RatingsRepository ratingsRepository, KeyConfig config) {
         this.ratingsRepository = ratingsRepository;
+        this.config = config;
     }
 
-    private String findMovieRating(String movieTitle) throws UnirestException{
-        if(movieTitle.matches("\\A\\p{ASCII}*\\z")){
+    private String findMovieRating(String movieTitle) throws UnirestException {
+        String url = config.getUrl();
+        if (movieTitle.matches("\\A\\p{ASCII}*\\z")) {
             Unirest.setTimeouts(10000, 20000);
-            HttpResponse<String> response = Unirest.get(URL + "t=" + movieTitle.replaceAll("\\s", "%20") +
+            HttpResponse<String> response = Unirest.get(url + "t=" + movieTitle.replaceAll("\\s", "%20") +
                     "&y=" + Year.now().getValue())
                     .asString();
             try {
@@ -45,7 +49,7 @@ public class RatingService {
                 correctRating = correctRating.replaceAll("}", "");
                 correctRating = correctRating.replaceAll("\"", "");
                 return correctRating;
-            } catch (JSONException e){
+            } catch (JSONException e) {
                 return "Currently not available";
             }
         } else {
@@ -58,10 +62,10 @@ public class RatingService {
         List<Rating> ratings = new ArrayList<>();
         Set<String> knownRatings = new HashSet<>();
         for (Movie movie : movies) {
-            if (!knownRatings.contains(movie.getOriginalTitle())){
+            if (!knownRatings.contains(movie.getOriginalTitle())) {
                 try {
                     String rating = findMovieRating(movie.getOriginalTitle());
-                    if(rating.equalsIgnoreCase("")){
+                    if (rating.equalsIgnoreCase("")) {
                         rating = "Currently not available";
                     }
                     ratings.add(new Rating(movie.getOriginalTitle(), rating));

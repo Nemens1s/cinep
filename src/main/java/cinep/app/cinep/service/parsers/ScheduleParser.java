@@ -14,8 +14,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ScheduleParser {
@@ -28,8 +27,16 @@ public class ScheduleParser {
         this.datesParser = datesParser;
     }
 
+    public List<Movie> getMoviesFromAPI() {
+        List<Movie> listOfMovies = new ArrayList<>();
+        List<Cinema> cinemas = new ArrayList<>(Arrays.asList(Cinema.values()));
+        cinemas.forEach(cinema -> listOfMovies.addAll(parseSchedule(cinema)));
+        listOfMovies.sort(Comparator.comparing(Movie::getStartTime));
+        return listOfMovies;
+    }
 
-    public List<Movie> parseSchedule(Cinema cinema) {
+
+    private List<Movie> parseSchedule(Cinema cinema) {
         List<Movie> movies = new ArrayList<>();
         List<String> dates = datesParser.getDates(cinema.getDatesUrl());
         dates.forEach(date -> movies.addAll(getSchedule(cinema.getScheduleUrl() + date)));
@@ -42,7 +49,10 @@ public class ScheduleParser {
         try {
             XMLEventReader xmlEventReader = factory.createXMLEventReader(new URL(url).openStream());
             while (xmlEventReader.hasNext()) {
-                movies.add(getMovie(xmlEventReader));
+                Movie movie = getMovie(xmlEventReader);
+                if (movie.getOriginalTitle() != null) {
+                    movies.add(movie);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,7 +60,7 @@ public class ScheduleParser {
         return movies;
     }
 
-    private Movie getMovie(XMLEventReader xmlEventReader){
+    private Movie getMovie(XMLEventReader xmlEventReader) {
         Movie movie = new Movie();
         while (xmlEventReader.hasNext()) {
             try {
@@ -81,6 +91,7 @@ public class ScheduleParser {
                         movie.setShowUrl(xmlEvent.asCharacters().getData());
                     } else if (startElement.getName().getLocalPart().equalsIgnoreCase("dttmShowStart")) {
                         xmlEvent = xmlEventReader.nextEvent();
+
                         LocalDateTime d = LocalDateTime.parse(xmlEvent.asCharacters().getData());
                         movie.setStartDate(d.toLocalDate());
                         movie.setStartTime(d.toLocalTime());
@@ -96,8 +107,8 @@ public class ScheduleParser {
                             } else {
                                 movie.setShowUrl("https://cinamonkino.com/kosmos/en");
                             }
-                            break;
                         }
+                        break;
                     }
                 }
             } catch (XMLStreamException e) {

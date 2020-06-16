@@ -1,4 +1,4 @@
-package cinep.app.cinep.service;
+package cinep.app.cinep.service.utilities;
 
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.dto.UserDto;

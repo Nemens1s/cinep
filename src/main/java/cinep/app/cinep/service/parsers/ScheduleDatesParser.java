@@ -16,12 +16,13 @@ import java.util.List;
 @Service
 public class ScheduleDatesParser {
 
-    public List<String> getDates (String url) {
+    public List<String> getDates(String url) {
         if (url.equals("")) {
             return new ArrayList<>(Collections.singletonList(""));
         }
         List<String> dates = new ArrayList<>();
         XMLInputFactory factory = XMLInputFactory.newInstance();
+        DateTimeFormatter parseFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         try {
             XMLEventReader xmlEventReader = factory.createXMLEventReader(new URL(url).openStream());
@@ -32,8 +33,9 @@ public class ScheduleDatesParser {
                     if (startElement.getName().getLocalPart().equalsIgnoreCase("dateTime")) {
                         xmlEvent = xmlEventReader.nextEvent();
                         String dateString = xmlEvent.asCharacters().toString();
-                        LocalDate date = LocalDate.parse(dateString, formatter);
-                        dates.add(date.toString());
+                        dateString = dateString.replace("T", " ");
+                        LocalDate date = LocalDate.parse(dateString, parseFormatter);
+                        dates.add(date.format(formatter));
                     }
                 }
             }

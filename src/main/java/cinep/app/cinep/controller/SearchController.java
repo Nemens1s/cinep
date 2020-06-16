@@ -20,23 +20,27 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @GetMapping(value = "/all")
-    public @ResponseBody List<MovieDto> findAll(){
+    @GetMapping("/all")
+    public @ResponseBody
+    List<MovieDto> findAll() {
         return searchService.findAllMovies();
     }
 
     @GetMapping("/theatre")
-    public @ResponseBody List<MovieDto> searchByTheatreName(@RequestParam String theatre) throws TheatreNotSupportedException {
+    public @ResponseBody
+    List<MovieDto> searchByTheatreName(@RequestParam String theatre) throws TheatreNotSupportedException {
         return searchService.findByTheatre(theatre);
     }
 
     @GetMapping("/title")
-    public @ResponseBody List<MovieDto> searchByTitle(@RequestParam String title) throws MovieTitleNotFoundException {
+    public @ResponseBody
+    List<MovieDto> searchByTitle(@RequestParam String title) throws MovieTitleNotFoundException {
         return searchService.findByTitle(title);
     }
 
     @GetMapping("/time")
-    public @ResponseBody List<MovieDto> searchByTime(@RequestParam String time){
+    public @ResponseBody
+    List<MovieDto> searchByTime(@RequestParam String time) {
         return searchService.findByTime(time);
     }
 }

@@ -8,6 +8,7 @@ import cinep.app.cinep.exceptions.UserNotFoundException;
 import cinep.app.cinep.model.User;
 import cinep.app.cinep.repository.UserRepository;
 import cinep.app.cinep.security.Role;
+import cinep.app.cinep.service.utilities.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;

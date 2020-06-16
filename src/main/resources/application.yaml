@@ -15,8 +15,11 @@ server:
   servlet:
     context-path: /api
 logging:
+  file:
     path: ./logs
 app:
   jwt:
     secret:
     durationMin: 60
+  rating:
+    url:
