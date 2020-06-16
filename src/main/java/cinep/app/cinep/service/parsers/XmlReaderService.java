@@ -1,4 +1,4 @@
-package cinep.app.cinep.service;
+package cinep.app.cinep.service.parsers;
 
 import cinep.app.cinep.model.Movie;
 import org.springframework.stereotype.Service;

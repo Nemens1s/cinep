@@ -3,10 +3,13 @@ package cinep.app.cinep.service;
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.exceptions.MovieTitleNotFoundException;
 import cinep.app.cinep.exceptions.TheatreNotSupportedException;
+import cinep.app.cinep.model.Cinema;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.Rating;
 import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.RatingsRepository;
+import cinep.app.cinep.service.parsers.ScheduleParser;
+import cinep.app.cinep.service.parsers.XmlReaderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +29,7 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
-    private final List<String> theatres = new ArrayList<>(Arrays.asList(
-            "https://www.forumcinemas.ee/xml/Schedule/",
-            "https://api.cinamonkino.com/xml/Schedule/?id=9989&lang=en-US",
-            "https://api.cinamonkino.com/xml/Schedule/?id=9999&lang=en-US",
-            "http://www.viimsikino.ee/xml/Schedule/",
-            "https://www.apollokino.ee/xml/Schedule/",
-            "https://www.kino.ee/xml/Schedule/"
-    ));
-
-    private final XmlReaderService xmlReaderService;
+    private final ScheduleParser scheduleParser;
     private final RatingService ratingService;
     private final MovieRepository movieRepository;
     private final ObjectMapper objectMapper;
@@ -43,9 +37,9 @@ public class SearchService {
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
     @Autowired
-    public SearchService(XmlReaderService xmlReaderService, RatingService ratingService, MovieRepository movieRepository,
+    public SearchService(ScheduleParser scheduleParser, RatingService ratingService, MovieRepository movieRepository,
                          ObjectMapper objectMapper, RatingsRepository ratingsRepository) {
-        this.xmlReaderService = xmlReaderService;
+        this.scheduleParser = scheduleParser;
         this.ratingService = ratingService;
         this.movieRepository = movieRepository;
         this.objectMapper = objectMapper;
@@ -56,13 +50,6 @@ public class SearchService {
     public List<MovieDto> findAllMovies() {
         List<Movie> movies = movieRepository.findAll();
         return objectMapper.convertMovieListToDtoList(movies);
-    }
-
-    private List<Movie> getMoviesFromAPI() {
-        List<Movie> listOfMovies = new ArrayList<>();
-        theatres.forEach(theatre -> listOfMovies.addAll(xmlReaderService.parseAllXml(theatre)));
-        listOfMovies.sort(Comparator.comparing(Movie::getStartTime));
-        return listOfMovies;
     }
 
     public List<MovieDto> findByTheatre(String theatreName) throws TheatreNotSupportedException {
@@ -87,6 +74,14 @@ public class SearchService {
         List<Movie> movies = movieRepository.findAll();
         movies = movies.stream().filter(movie -> Duration.between(timeToParse, movie.getStartTime()).getSeconds() <= 14400 ).collect(Collectors.toList());
         return objectMapper.convertMovieListToDtoList(movies);
+    }
+
+    private List<Movie> getMoviesFromAPI() {
+        List<Movie> listOfMovies = new ArrayList<>();
+        List<Cinema> cinemas = new ArrayList<>(Arrays.asList(Cinema.values()));
+        cinemas.forEach(cinema -> listOfMovies.addAll(scheduleParser.parseSchedule(cinema)));
+        listOfMovies.sort(Comparator.comparing(Movie::getStartTime));
+        return listOfMovies;
     }
 
     @Scheduled(cron = "0 0 4 * * ?", zone = "Europe/Tallinn")
