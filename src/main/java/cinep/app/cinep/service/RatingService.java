@@ -39,16 +39,14 @@ public class RatingService {
                     .asString();
             try {
                 JSONArray jsonArray = new JSONObject(response.getBody()).getJSONArray("Ratings");
-                StringBuilder rating = new StringBuilder();
+                StringBuilder ratings = new StringBuilder();
                 for (int i = 0; i < jsonArray.length() - 1; i++) {
-                    rating.append(jsonArray.get(i));
-                    rating.append(" ");
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String source = jsonObject.getString("Source");
+                    String rating = jsonObject.getString("Value");
+                    ratings.append(source).append(":").append(rating).append("\n");
                 }
-                String correctRating = rating.toString().replaceAll("\\\\", " ").replaceAll("Value", "Rating");
-                correctRating = correctRating.replaceAll("\\{", "");
-                correctRating = correctRating.replaceAll("}", "");
-                correctRating = correctRating.replaceAll("\"", "");
-                return correctRating;
+                return ratings.toString();
             } catch (JSONException e) {
                 return "Currently not available";
             }
