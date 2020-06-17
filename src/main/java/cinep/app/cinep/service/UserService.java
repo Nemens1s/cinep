@@ -7,6 +7,7 @@ import cinep.app.cinep.exceptions.UserAlreadyInDatabaseException;
 import cinep.app.cinep.exceptions.UserNotFoundException;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
+import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.UserRepository;
 import cinep.app.cinep.security.Role;
 import cinep.app.cinep.service.utilities.ObjectMapper;
@@ -14,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -22,40 +26,43 @@ public class UserService{
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder;
+    private final MovieRepository movieRepository;
     @Autowired
-    public UserService(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder,
+                       MovieRepository movieRepository) {
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.passwordEncoder = passwordEncoder;
+        this.movieRepository = movieRepository;
     }
 
 
-    public Set<String> getBookmarks(String username) throws UserNotFoundException {
+    public Set<Movie> getBookmarks(String username) throws UserNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user == null){
             throw new UserNotFoundException("There is no user with: " + username);
         }
-        return userRepository.getBookmarks(user.getId());
+        return fetchBookmarks(user.getBookmarks());
     }
 
-    public Set<String> addToBookmarks(String title, String username) throws UserNotFoundException, MovieAlreadyInBookmarksException {
+    public Set<Movie> addToBookmarks(Long movieId, String username) throws UserNotFoundException, MovieAlreadyInBookmarksException {
         User user = userRepository.findByUsername(username);
         if (user == null){
             throw new UserNotFoundException("There is no user with: " + username);
         }
-        if (user.getBookmarks().contains(title)){
+        if (user.getBookmarks().contains(movieId)){
             throw new MovieAlreadyInBookmarksException("You already have this movie in your bookmarks");
         }
-        user.getBookmarks().add(title);
+        user.getBookmarks().add(movieId);
         userRepository.save(user);
-        return user.getBookmarks();
+        return fetchBookmarks(user.getBookmarks());
     }
 
-    public String removeBookmark(String title, String username) {
+    public Long removeBookmark(Long id, String username) {
         User user = userRepository.findByUsername(username);
-        user.getBookmarks().remove(title);
+        user.getBookmarks().remove(id);
         userRepository.save(user);
-        return title;
+        return id;
     }
 
     public HttpStatus register(UserDto userDto) throws UserAlreadyInDatabaseException {
@@ -83,5 +90,14 @@ public class UserService{
         }
         userRepository.delete(user);
         return objectMapper.convertUserToDto(user);
+    }
+
+    private Set<Movie> fetchBookmarks(Set<Long> movieIDs) {
+        Set<Movie> movies = new LinkedHashSet<>();
+        for (Long id : movieIDs) {
+            Optional<Movie> movie = movieRepository.findById(id);
+            movie.ifPresent(movies::add);
+        }
+        return movies;
     }
 }

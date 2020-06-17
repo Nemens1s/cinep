@@ -28,9 +28,9 @@ public class User {
 
     @ElementCollection(fetch=FetchType.LAZY)
     @CollectionTable(name = "user_bookmarks", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "movie_title")
+    @Column(name = "movie_id")
     @JsonIgnore
-    private Set<String> bookmarks;
+    private Set<Long> bookmarks;
 
     @Enumerated(EnumType.STRING)
     private Role role;

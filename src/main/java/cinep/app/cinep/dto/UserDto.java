@@ -14,5 +14,5 @@ import java.util.Set;
 public class UserDto {
     private String username;
     private String password;
-    private Set<String> bookmarks;
+    private Set<Long> bookmarks;
 }

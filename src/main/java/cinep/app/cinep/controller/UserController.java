@@ -6,6 +6,7 @@ import cinep.app.cinep.exceptions.MovieAlreadyInBookmarksException;
 import cinep.app.cinep.exceptions.MyBadRequestException;
 import cinep.app.cinep.exceptions.UserAlreadyInDatabaseException;
 import cinep.app.cinep.exceptions.UserNotFoundException;
+import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.security.*;
 import cinep.app.cinep.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class UserController {
 
     @GetMapping(value = "/bookmarks/show")
     @Secured(Roles.USER)
-    public @ResponseBody Set<String> viewBookmarks() throws UserNotFoundException {
+    public @ResponseBody Set<Movie> viewBookmarks() throws UserNotFoundException {
         CinepUser cinepUser = current();
         return userService.getBookmarks(cinepUser.getUsername());
     }
@@ -51,16 +52,16 @@ public class UserController {
 
     @PostMapping(value = "/bookmarks/add")
     @Secured(Roles.USER)
-    public Set<String> addToBookmarks(@RequestBody String title) throws UserNotFoundException, MovieAlreadyInBookmarksException {
+    public Set<Movie> addToBookmarks(@RequestBody Long movieId) throws UserNotFoundException, MovieAlreadyInBookmarksException {
         CinepUser cinepUser = current();
-        return userService.addToBookmarks(title, cinepUser.getUsername());
+        return userService.addToBookmarks(movieId, cinepUser.getUsername());
     }
 
     @DeleteMapping(value = "/bookmarks/delete/{title}")
     @Secured(Roles.USER)
-    public HttpStatus removeBookmark(@PathVariable String title){
+    public HttpStatus removeBookmark(@PathVariable Long movieId){
         CinepUser cinepUser = current();
-        userService.removeBookmark(title, cinepUser.getUsername());
+        userService.removeBookmark(movieId, cinepUser.getUsername());
         return HttpStatus.OK;
     }
 

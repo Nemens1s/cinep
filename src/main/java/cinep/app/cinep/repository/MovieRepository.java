@@ -14,4 +14,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("FROM Movie WHERE theatre = ?1")
     List<Movie> findByTheatre(String theatre);
+
 }
