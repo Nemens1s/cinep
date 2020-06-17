@@ -5,6 +5,7 @@ import cinep.app.cinep.exceptions.MovieAlreadyInBookmarksException;
 import cinep.app.cinep.exceptions.MyBadRequestException;
 import cinep.app.cinep.exceptions.UserAlreadyInDatabaseException;
 import cinep.app.cinep.exceptions.UserNotFoundException;
+import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
 import cinep.app.cinep.repository.UserRepository;
 import cinep.app.cinep.security.Role;
@@ -34,7 +35,7 @@ public class UserService{
         if (user == null){
             throw new UserNotFoundException("There is no user with: " + username);
         }
-        return user.getBookmarks();
+        return userRepository.getBookmarks(user.getId());
     }
 
     public Set<String> addToBookmarks(String title, String username) throws UserNotFoundException, MovieAlreadyInBookmarksException {
