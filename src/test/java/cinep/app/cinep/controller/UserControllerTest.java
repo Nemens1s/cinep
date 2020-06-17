@@ -1,6 +1,7 @@
 package cinep.app.cinep.controller;
 
 import cinep.app.cinep.dto.UserDto;
+import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
 import cinep.app.cinep.repository.UserRepository;
 import cinep.app.cinep.security.JwtTokenProvider;
@@ -59,7 +60,7 @@ public class UserControllerTest {
         }
     }
 
-    private static final ParameterizedTypeReference<Set<String>> BOOKMARKS = new ParameterizedTypeReference<Set<String>>() {
+    private static final ParameterizedTypeReference<Set<Movie>> BOOKMARKS = new ParameterizedTypeReference<Set<Movie>>() {
     };
 
     @Test
@@ -70,14 +71,14 @@ public class UserControllerTest {
 
         ResponseEntity bookmarks = template.exchange("/profile/bookmarks/show", HttpMethod.GET, entity, BOOKMARKS);
         assertEquals(HttpStatus.OK, bookmarks.getStatusCode());
-        Set<String> body = (Set<String>) bookmarks.getBody();
+        Set<Movie> body = (Set<Movie>) bookmarks.getBody();
         assert body != null;
-        assertEquals(2, body.size());
+        assertEquals(3, body.size());
     }
     @Test
     public void addBookMarksSuccess(){
         String token = jwtTokenProvider.createTokenForTests("Third User");
-        HttpEntity<String> entity = new HttpEntity<>("New Title", authHeader(token));
+        HttpEntity<Long> entity = new HttpEntity<>(100L, authHeader(token));
         ResponseEntity responseEntity = template.exchange("/profile/bookmarks/add", HttpMethod.POST, entity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }

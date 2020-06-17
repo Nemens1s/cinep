@@ -21,3 +21,5 @@ app:
   jwt:
     secret: SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
     durationMin: 60
+  rating:
+    url:

@@ -129,9 +129,9 @@ public class ObjectMapperTest {
         user.setId(1L);
         Set<Movie> movies = new HashSet<>();
         movies.add(getMovie());
-        Set<String> titles = new HashSet<>();
-        movies.forEach(movie -> titles.add(movie.getOriginalTitle()));
-        user.setBookmarks(titles);
+        Set<Long> ids = new HashSet<>();
+        movies.forEach(movie -> ids.add(movie.getId()));
+        user.setBookmarks(ids);
         return user;
     }
 
@@ -140,9 +140,9 @@ public class ObjectMapperTest {
         userDto.setUsername("Test");
         Set<MovieDto> movieDtos = new HashSet<>();
         movieDtos.add(getMovieDto());
-        Set<String> titles = new HashSet<>();
-        movieDtos.forEach(movie -> titles.add(movie.getOriginalTitle()));
-        userDto.setBookmarks(titles);
+        Set<Long> ids = new HashSet<>();
+        movieDtos.forEach(movie -> ids.add(movie.getId()));
+        userDto.setBookmarks(ids);
         return userDto;
     }
 }

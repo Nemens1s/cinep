@@ -5,6 +5,7 @@ import cinep.app.cinep.exceptions.MovieAlreadyInBookmarksException;
 import cinep.app.cinep.exceptions.MyBadRequestException;
 import cinep.app.cinep.exceptions.UserAlreadyInDatabaseException;
 import cinep.app.cinep.exceptions.UserNotFoundException;
+import cinep.app.cinep.model.Movie;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,14 +65,14 @@ public class UserServiceTest {
     @Test(expected = UserNotFoundException.class)
     @Transactional
     public void insertIntoBookmarksUserNotFoundException() throws UserNotFoundException, MovieAlreadyInBookmarksException {
-        userService.addToBookmarks("Some title", "Not found");
+        userService.addToBookmarks(100L, "Not found");
     }
 
     @Test(expected = MovieAlreadyInBookmarksException.class)
     @Transactional
     public void insertIntoBookmarksAlreadyInBookmarksException() throws MovieAlreadyInBookmarksException, UserNotFoundException {
-        userService.addToBookmarks("Some title", "First User");
-        userService.addToBookmarks("Some title", "First User");
+        userService.addToBookmarks(100L, "First User");
+        userService.addToBookmarks(100L, "First User");
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -83,14 +84,14 @@ public class UserServiceTest {
     @Test
     @Transactional
     public void getBookmarksFromUserWithoutBookmarks() throws UserNotFoundException {
-        Set<String> movieDtos = userService.getBookmarks("Seventh User");
+        Set<Movie> movieDtos = userService.getBookmarks("Seventh User");
         assertEquals(0, movieDtos.size());
     }
 
     @Test
     @Transactional
     public void getBookmarksUserHasMultipleBookmarks() throws UserNotFoundException {
-        Set<String> movieDtos = userService.getBookmarks("First User");
+        Set<Movie> movieDtos = userService.getBookmarks("First User");
         assertEquals(2, movieDtos.size());
     }
 
@@ -98,9 +99,7 @@ public class UserServiceTest {
     @Test
     @Transactional
     public void insertIntoBookMarksSuccess() throws UserNotFoundException, MovieAlreadyInBookmarksException {
-        Set<String> bookmarks = new HashSet<>();
-        bookmarks.add("Some Title");
-        assertEquals(bookmarks, userService.addToBookmarks("Some Title", "Seventh User"));
+        assertEquals(1, userService.addToBookmarks(1L, "Seventh User").size());
     }
 
     @Test

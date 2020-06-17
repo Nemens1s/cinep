@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS USER_BOOKMARKS;
 
 CREATE TABLE USER_BOOKMARKS(
     user_id LONG DEFAULT not null,
-    movie_title VARCHAR(255) DEFAULT not null
+    movie_id LONG DEFAULT not null
 );
 
 DROP TABLE IF EXISTS MOVIES;
@@ -53,15 +53,15 @@ INSERT into MOVIES(id, ORIGINAL_TITLE, THEATRE, THEATRE_AUDITORIUM, DURATION_IN_
     (12, 'Alien', 'Artis', '1', 90);
 
 
-INSERT into USER_BOOKMARKS(user_id, movie_title) VALUES
-    (1, 'Star Wars'),
-    (1, 'Avengers'),
-    (3, 'Star Wars'),
-    (3, 'Star Wars'),
-    (3, 'Avengers'),
-    (6, 'Star Wars'),
-    (4, 'Predator'),
-    (4, 'Predator'),
-    (6, 'Alien'),
-    (5, 'Star Wars'),
-    (4, 'Star Wars');
+INSERT into USER_BOOKMARKS(user_id, movie_id) VALUES
+    (1, 1),
+    (1, 10),
+    (3, 7),
+    (3, 3),
+    (3, 10),
+    (6, 1),
+    (4, 9),
+    (4, 9),
+    (6, 11),
+    (5, 3),
+    (4, 1);
