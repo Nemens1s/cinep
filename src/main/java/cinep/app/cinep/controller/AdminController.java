@@ -1,12 +1,13 @@
 package cinep.app.cinep.controller;
 
 
+import cinep.app.cinep.dto.UserDto;
+import cinep.app.cinep.exceptions.UserNotFoundException;
+import cinep.app.cinep.service.UserService;
 import cinep.app.cinep.service.utilities.DatabaseRefresher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
     private final DatabaseRefresher refresher;
+    private final UserService userService;
 
     @Autowired
-    public AdminController(DatabaseRefresher refresher) {
+    public AdminController(DatabaseRefresher refresher, UserService userService) {
         this.refresher = refresher;
+        this.userService = userService;
     }
 
     @GetMapping("/fetch")
@@ -30,5 +33,10 @@ public class AdminController {
     public HttpStatus refreshMovies() {
         refresher.refresh();
         return HttpStatus.OK;
+    }
+
+    @DeleteMapping("/delete/{username}")
+    public UserDto delete(@PathVariable String username) throws UserNotFoundException {
+        return userService.deleteUser(username);
     }
 }

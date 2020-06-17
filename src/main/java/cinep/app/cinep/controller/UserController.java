@@ -88,11 +88,6 @@ public class UserController {
         return new LoginDetails(cinepUser.getUsername(), token,cinepUser.getRole(),  toAuthorities(cinepUser));
 
     }
-    @DeleteMapping("/delete/{username}")
-    @Secured(Roles.ADMIN)
-    public UserDto delete(@PathVariable String username) throws UserNotFoundException {
-        return userService.deleteUser(username);
-    }
 
     private CinepUser current(){
         return UserSessionHolder.getLoggedInUser();
