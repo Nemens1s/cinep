@@ -4,6 +4,7 @@ import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.dto.UserDto;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
+import cinep.app.cinep.service.utilities.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
