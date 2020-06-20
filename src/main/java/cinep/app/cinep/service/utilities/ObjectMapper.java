@@ -25,6 +25,7 @@ public class ObjectMapper{
         movieDto.setStartDate(movie.getStartDate());
         movieDto.setStartTime(movie.getStartTime());
         movieDto.setDurationInMinutes(movie.getDurationInMinutes());
+        movieDto.setProductionYear(movie.getProductionYear());
         return movieDto;
     }
 
@@ -56,7 +57,8 @@ public class ObjectMapper{
         movie.setId(movieDto.getId());
         movie.setStartDate(movieDto.getStartDate());
         movie.setStartTime(movieDto.getStartTime());
-        movie.setDurationInMinutes(movie.getDurationInMinutes());
+        movie.setDurationInMinutes(movieDto.getDurationInMinutes());
+        movie.setProductionYear(movieDto.getProductionYear());
         return movie;
     }
 

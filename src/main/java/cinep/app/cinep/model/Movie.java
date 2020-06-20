@@ -26,4 +26,5 @@ public class Movie {
     private LocalTime startTime;
     private String userRating;
     private String showUrl;
+    private String productionYear = "";
 }

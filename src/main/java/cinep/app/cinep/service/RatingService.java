@@ -30,12 +30,14 @@ public class RatingService {
         this.config = config;
     }
 
-    private String findMovieRating(String movieTitle) throws UnirestException {
+    private String findMovieRating(Movie movie) throws UnirestException {
+        String movieTitle = movie.getOriginalTitle();
+        String productionYear = movie.getProductionYear();
         String url = config.getUrl();
         if (movieTitle.matches("\\A\\p{ASCII}*\\z")) {
             Unirest.setTimeouts(10000, 20000);
-            HttpResponse<String> response = Unirest.get(url + "t=" + movieTitle.replaceAll("\\s", "%20") +
-                    "&y=" + Year.now().getValue())
+            HttpResponse<String> response = Unirest.get(url + "t=" + movieTitle.replaceAll("\\s", "%20")
+                    + "&y=" + productionYear)
                     .asString();
             try {
                 JSONArray jsonArray = new JSONObject(response.getBody()).getJSONArray("Ratings");
@@ -60,9 +62,10 @@ public class RatingService {
         List<Rating> ratings = new ArrayList<>();
         Set<String> knownRatings = new HashSet<>();
         for (Movie movie : movies) {
-            if (!knownRatings.contains(movie.getOriginalTitle())) {
+            if (!knownRatings.contains(movie.getOriginalTitle())
+                    && movie.getTheatre().equalsIgnoreCase("Coca Cola Plaza")) {
                 try {
-                    String rating = findMovieRating(movie.getOriginalTitle());
+                    String rating = findMovieRating(movie);
                     if (rating.equalsIgnoreCase("")) {
                         rating = "Currently not available";
                     }

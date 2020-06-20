@@ -95,6 +95,9 @@ public class ScheduleParser {
                         LocalDateTime d = LocalDateTime.parse(xmlEvent.asCharacters().getData());
                         movie.setStartDate(d.toLocalDate());
                         movie.setStartTime(d.toLocalTime());
+                    } else if (startElement.getName().getLocalPart().equalsIgnoreCase("ProductionYear")) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        movie.setProductionYear(xmlEvent.asCharacters().getData());
                     }
 
                 }

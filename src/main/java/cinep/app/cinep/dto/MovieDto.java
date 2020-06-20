@@ -20,4 +20,5 @@ public class MovieDto {
     private LocalTime startTime;
     private String userRating;
     private String showUrl;
+    private String productionYear;
 }
