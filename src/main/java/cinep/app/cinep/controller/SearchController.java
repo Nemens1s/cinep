@@ -43,4 +43,9 @@ public class SearchController {
     List<MovieDto> searchByTime(@RequestParam String time) {
         return searchService.findByTime(time);
     }
+
+    @GetMapping("/genre")
+    public @ResponseBody List<MovieDto> searchByGenres(@RequestParam(name = "g") List<String> genreDesc) {
+        return searchService.findByGenres(genreDesc);
+    }
 }

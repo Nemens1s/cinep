@@ -3,7 +3,9 @@ package cinep.app.cinep.service;
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.exceptions.MovieTitleNotFoundException;
 import cinep.app.cinep.exceptions.TheatreNotSupportedException;
+import cinep.app.cinep.model.Genre;
 import cinep.app.cinep.model.Movie;
+import cinep.app.cinep.repository.GenreRepository;
 import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.service.utilities.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,13 @@ import java.util.stream.Collectors;
 public class SearchService {
 
     private final MovieRepository movieRepository;
+    private final GenreRepository genreRepository;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public SearchService(MovieRepository movieRepository, ObjectMapper objectMapper) {
+    public SearchService(MovieRepository movieRepository, GenreRepository genreRepository, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
+        this.genreRepository = genreRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -57,6 +61,14 @@ public class SearchService {
         LocalTime timeToParse = LocalTime.parse(time, formatter);
         List<Movie> movies = movieRepository.findAll();
         movies = movies.stream().filter(movie -> Duration.between(timeToParse, movie.getStartTime()).getSeconds() <= 14400 ).collect(Collectors.toList());
+        return objectMapper.convertMovieListToDtoList(movies);
+    }
+
+    public List<MovieDto> findByGenres(List<String> genreDescription) {
+        List<Movie> movies = new ArrayList<>();
+        for (String desc : genreDescription) {
+         movies.addAll(movieRepository.findByGenre(desc));
+        }
         return objectMapper.convertMovieListToDtoList(movies);
     }
 
