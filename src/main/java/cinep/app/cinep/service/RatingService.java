@@ -3,7 +3,7 @@ package cinep.app.cinep.service;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.Rating;
 import cinep.app.cinep.repository.RatingsRepository;
-import cinep.app.cinep.service.utilities.ApiConfig;
+import cinep.app.cinep.config.ApiConfig;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;

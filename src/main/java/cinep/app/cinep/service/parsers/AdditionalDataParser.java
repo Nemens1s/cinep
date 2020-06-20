@@ -2,7 +2,7 @@ package cinep.app.cinep.service.parsers;
 
 
 import cinep.app.cinep.model.Movie;
-import cinep.app.cinep.service.utilities.ApiConfig;
+import cinep.app.cinep.config.ApiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

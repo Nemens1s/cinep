@@ -1,4 +1,4 @@
-package cinep.app.cinep.service.utilities;
+package cinep.app.cinep.config;
 
 import lombok.Getter;
 import lombok.Setter;

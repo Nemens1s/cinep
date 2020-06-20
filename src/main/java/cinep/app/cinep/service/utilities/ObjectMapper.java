@@ -1,7 +1,9 @@
 package cinep.app.cinep.service.utilities;
 
+import cinep.app.cinep.dto.GenreDto;
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.dto.UserDto;
+import cinep.app.cinep.model.Genre;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class ObjectMapper{
+public class ObjectMapper {
 
     public MovieDto convertMovieToDto(Movie movie) {
         MovieDto movieDto = new MovieDto();
@@ -71,7 +73,7 @@ public class ObjectMapper{
 
     public Set<Movie> convertDtoSetToMovieSet(Set<MovieDto> movieDtoSet) {
         Set<Movie> movieSet = new HashSet<>();
-        for (MovieDto movieDto : movieDtoSet){
+        for (MovieDto movieDto : movieDtoSet) {
             Movie movie = convertDtoToMovie(movieDto);
             movieSet.add(movie);
         }
@@ -81,16 +83,22 @@ public class ObjectMapper{
 
     public Set<MovieDto> convertMovieSetToDtoSet(Set<Movie> movieSet) {
         Set<MovieDto> movieDtoSet = new HashSet<>();
-        for (Movie movie : movieSet){
+        for (Movie movie : movieSet) {
             MovieDto movieDto = convertMovieToDto(movie);
             movieDtoSet.add(movieDto);
         }
         return movieDtoSet;
     }
 
-    public List<MovieDto> convertMovieListToDtoList(List<Movie> movies){
+    public List<MovieDto> convertMovieListToDtoList(List<Movie> movies) {
         List<MovieDto> movieDtos = new ArrayList<>();
         movies.forEach(movie -> movieDtos.add(convertMovieToDto(movie)));
         return movieDtos;
+    }
+
+    public GenreDto convertGenreToDto(Genre genre) {
+        GenreDto genreDto = new GenreDto();
+        genreDto.setDescription(genre.getDescription());
+        return genreDto;
     }
 }
