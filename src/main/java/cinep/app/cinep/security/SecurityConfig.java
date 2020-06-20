@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .headers().httpStrictTransportSecurity().disable()
-//                .frameOptions().disable()
+                .frameOptions().disable()
                 .and()
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
@@ -51,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/movies/*").permitAll()
-                .antMatchers("/h2").permitAll()
+                .antMatchers("/h2/*").permitAll()
                 .antMatchers("/profile/register").permitAll()
                 .antMatchers("/profile/login").permitAll()
                 .antMatchers("/admin/*").permitAll()

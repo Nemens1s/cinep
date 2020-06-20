@@ -3,7 +3,7 @@ package cinep.app.cinep.service;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.Rating;
 import cinep.app.cinep.repository.RatingsRepository;
-import cinep.app.cinep.service.utilities.KeyConfig;
+import cinep.app.cinep.service.utilities.ApiConfig;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -14,18 +14,17 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Year;
 import java.util.*;
 
 @Service
 @Setter
 public class RatingService {
 
-    private KeyConfig config;
+    private ApiConfig config;
     private final RatingsRepository ratingsRepository;
 
     @Autowired
-    public RatingService(RatingsRepository ratingsRepository, KeyConfig config) {
+    public RatingService(RatingsRepository ratingsRepository, ApiConfig config) {
         this.ratingsRepository = ratingsRepository;
         this.config = config;
     }

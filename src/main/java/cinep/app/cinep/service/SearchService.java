@@ -44,7 +44,8 @@ public class SearchService {
     }
 
     public List<MovieDto> findByTitle(String title) throws MovieTitleNotFoundException {
-        List<Movie> movies = movieRepository.findByTitle(title);
+        List<Movie> movies = movieRepository.findByOriginalTitle(title);
+        movies.addAll(movieRepository.findByTitle(title));
         if (movies.isEmpty()) {
             throw new MovieTitleNotFoundException("There is no movie with that title");
         }

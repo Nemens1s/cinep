@@ -3,7 +3,6 @@ package cinep.app.cinep.service.parsers;
 import cinep.app.cinep.model.Cinema;
 import cinep.app.cinep.model.Movie;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.xml.stream.XMLEventReader;
@@ -98,6 +97,9 @@ public class ScheduleParser {
                     } else if (startElement.getName().getLocalPart().equalsIgnoreCase("ProductionYear")) {
                         xmlEvent = xmlEventReader.nextEvent();
                         movie.setProductionYear(xmlEvent.asCharacters().getData());
+                    } else if (startElement.getName().getLocalPart().equalsIgnoreCase("title")) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        movie.setEstonianTitle(xmlEvent.asCharacters().getData());
                     }
 
                 }

@@ -6,6 +6,7 @@ import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.RatingsRepository;
 import cinep.app.cinep.service.RatingService;
 import cinep.app.cinep.service.SearchService;
+import cinep.app.cinep.service.parsers.AdditionalDataParser;
 import cinep.app.cinep.service.parsers.ScheduleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +27,17 @@ import java.util.stream.Collectors;
 public class DatabaseRefresher {
 
     private final ScheduleParser scheduleParser;
+    private final AdditionalDataParser dataParser;
     private final RatingService ratingService;
     private final MovieRepository movieRepository;
     private final RatingsRepository ratingsRepository;
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
     @Autowired
-    public DatabaseRefresher(ScheduleParser scheduleParser, RatingService ratingService, MovieRepository movieRepository,
+    public DatabaseRefresher(ScheduleParser scheduleParser, AdditionalDataParser dataParser, RatingService ratingService, MovieRepository movieRepository,
                              RatingsRepository ratingsRepository) {
         this.scheduleParser = scheduleParser;
+        this.dataParser = dataParser;
         this.ratingService = ratingService;
         this.movieRepository = movieRepository;
         this.ratingsRepository = ratingsRepository;
@@ -45,7 +48,7 @@ public class DatabaseRefresher {
         movieRepository.deleteAll();
         List<Movie> movies = scheduleParser.getMoviesFromAPI();
         logger.info("Total movies " + movies.size());
-        movies.sort(Comparator.comparing(Movie::getStartTime));
+        movies.sort(Comparator.comparing(Movie::getStartDate).thenComparing(Movie::getStartTime));
         movieRepository.saveAll(movies);
     }
 

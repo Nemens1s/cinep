@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties (prefix = "app.rating")
-public class KeyConfig {
+@ConfigurationProperties (prefix = "app.api")
+public class ApiConfig {
     private String url;
+    private String rus;
+    private String eng;
 }

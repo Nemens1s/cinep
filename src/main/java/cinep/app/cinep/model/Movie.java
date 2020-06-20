@@ -19,6 +19,9 @@ public class Movie {
     @Id
     private Long id;
     private String originalTitle;
+    private String estonianTitle;
+    private String russianTitle;
+    private String englishTitle;
     private String theatre;
     private String theatreAuditorium;
     private Integer durationInMinutes;
@@ -27,4 +30,7 @@ public class Movie {
     private String userRating;
     private String showUrl;
     private String productionYear = "";
+
+    @OneToMany(mappedBy = "movie")
+    private Set<Genre> genres;
 }

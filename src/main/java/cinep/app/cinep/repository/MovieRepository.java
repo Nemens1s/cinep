@@ -10,6 +10,9 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("FROM Movie WHERE originalTitle = ?1")
+    List<Movie> findByOriginalTitle(String title);
+
+    @Query("FROM Movie WHERE estonianTitle = ?1")
     List<Movie> findByTitle(String title);
 
     @Query("FROM Movie WHERE theatre = ?1")

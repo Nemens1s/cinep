@@ -26,6 +26,9 @@ public class ObjectMapper{
         movieDto.setStartTime(movie.getStartTime());
         movieDto.setDurationInMinutes(movie.getDurationInMinutes());
         movieDto.setProductionYear(movie.getProductionYear());
+        movieDto.setEstonianTitle(movie.getEstonianTitle());
+        movieDto.setEnglishTitle(movie.getEnglishTitle());
+        movieDto.setRussianTitle(movie.getRussianTitle());
         return movieDto;
     }
 
@@ -59,6 +62,9 @@ public class ObjectMapper{
         movie.setStartTime(movieDto.getStartTime());
         movie.setDurationInMinutes(movieDto.getDurationInMinutes());
         movie.setProductionYear(movieDto.getProductionYear());
+        movie.setEstonianTitle(movieDto.getEstonianTitle());
+        movie.setEnglishTitle(movieDto.getEnglishTitle());
+        movie.setRussianTitle(movieDto.getRussianTitle());
         return movie;
     }
 

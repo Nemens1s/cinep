@@ -13,6 +13,9 @@ import java.time.LocalTime;
 public class MovieDto {
     private Long id;
     private String originalTitle;
+    private String estonianTitle;
+    private String russianTitle;
+    private String englishTitle;
     private String theatre;
     private String theatreAuditorium;
     private Integer durationInMinutes;
