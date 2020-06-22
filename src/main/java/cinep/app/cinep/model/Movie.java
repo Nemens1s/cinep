@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -30,7 +31,4 @@ public class Movie {
     private String userRating;
     private String showUrl;
     private String productionYear = "";
-
-    @OneToMany(mappedBy = "movie")
-    private Set<Genre> genres;
 }

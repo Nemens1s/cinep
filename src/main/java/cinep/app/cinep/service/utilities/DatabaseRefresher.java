@@ -2,8 +2,10 @@ package cinep.app.cinep.service.utilities;
 
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.Rating;
+import cinep.app.cinep.pojo.MovieData;
 import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.RatingsRepository;
+import cinep.app.cinep.service.GenreService;
 import cinep.app.cinep.service.RatingService;
 import cinep.app.cinep.service.SearchService;
 import cinep.app.cinep.service.parsers.AdditionalDataParser;
@@ -31,25 +33,31 @@ public class DatabaseRefresher {
     private final RatingService ratingService;
     private final MovieRepository movieRepository;
     private final RatingsRepository ratingsRepository;
+    private final GenreService genreService;
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
     @Autowired
-    public DatabaseRefresher(ScheduleParser scheduleParser, AdditionalDataParser dataParser, RatingService ratingService, MovieRepository movieRepository,
-                             RatingsRepository ratingsRepository) {
+    public DatabaseRefresher(ScheduleParser scheduleParser, AdditionalDataParser dataParser, RatingService ratingService,
+                             MovieRepository movieRepository, RatingsRepository ratingsRepository,
+                             GenreService genreService) {
         this.scheduleParser = scheduleParser;
         this.dataParser = dataParser;
         this.ratingService = ratingService;
         this.movieRepository = movieRepository;
         this.ratingsRepository = ratingsRepository;
+        this.genreService = genreService;
     }
 
     public void fetchMovies() {
         logger.info("Getting new movies to database: Time is " + LocalDateTime.now());
         movieRepository.deleteAll();
         List<Movie> movies = scheduleParser.getMoviesFromAPI();
+        Map<String, MovieData> movieData = dataParser.getData();
+        addTitlesToMovies(movies, movieData);
         logger.info("Total movies " + movies.size());
         movies.sort(Comparator.comparing(Movie::getStartDate).thenComparing(Movie::getStartTime));
         movieRepository.saveAll(movies);
+        genreService.updateGenres(movies, movieData);
     }
 
     public void refresh() {
@@ -83,5 +91,16 @@ public class DatabaseRefresher {
     @Scheduled(cron = "0 0 * * * *")
     private void refreshDataBase() {
         refresh();
+    }
+
+    private void addTitlesToMovies (List<Movie> movies, Map<String, MovieData> movieData) {
+        for (Movie movie : movies) {
+            if (movieData.containsKey(movie.getOriginalTitle())) {
+                MovieData data = movieData.get(movie.getOriginalTitle());
+                movie.setRussianTitle(data.getRusTitle());
+                movie.setEnglishTitle(data.getEngTitle());
+                movie.setEstonianTitle(data.getEstTitle());
+            }
+        }
     }
 }

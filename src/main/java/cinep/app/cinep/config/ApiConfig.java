@@ -13,4 +13,5 @@ public class ApiConfig {
     private String url;
     private String rus;
     private String eng;
+    private String est;
 }

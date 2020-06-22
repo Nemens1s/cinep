@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Genre {
 
     @Id
@@ -25,4 +24,9 @@ public class Genre {
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
+
+    public Genre(String description, Movie movie) {
+        this.description = description;
+        this.movie = movie;
+    }
 }
