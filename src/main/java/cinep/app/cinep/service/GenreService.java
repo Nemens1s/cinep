@@ -22,6 +22,10 @@ public class GenreService {
         this.genreRepository = genreRepository;
     }
 
+    public List<Genre> findUniqueGenres() {
+        return genreRepository.findGenres();
+    }
+
     public void updateGenres(List<Movie> movies, Map<String, MovieData> movieDataMap) {
         List<Genre> genres = new ArrayList<>();
         genreRepository.deleteAll();

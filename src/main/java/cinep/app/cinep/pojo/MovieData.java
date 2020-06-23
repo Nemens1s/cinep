@@ -8,11 +8,11 @@ import lombok.Setter;
 public class MovieData {
 
     private String originalTitle;
-    private String estTitle;
-    private String engTitle;
-    private String rusTitle;
+    private String estTitle = "Pealkiri pole saadaval";
+    private String engTitle = "Title is not available";
+    private String rusTitle = "Название недоступно";
 
-    private String estGenres;
-    private String engGenres;
-    private String rusGenres;
+    private String estGenres = "Not available";
+    private String engGenres = "Not available";
+    private String rusGenres = "Not available";
 }

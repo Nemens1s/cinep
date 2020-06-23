@@ -11,10 +11,9 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class AdditionalDataParser {
@@ -33,12 +32,35 @@ public class AdditionalDataParser {
 
     public Map<String, MovieData> getData() {
         Map<String, MovieData> dataMap = new HashMap<>();
-        List<MovieData> estData = parseData(config.getEst(), EST);
-        updateMap(dataMap, estData, EST);
-        List<MovieData> engData = parseData(config.getEng(), ENG);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate date = LocalDate.now();
+        List<MovieData> estData = parseData(config.getEst() + date.format(formatter), EST);
+        while (!date.isEqual(LocalDate.now().plusDays(10))) {
+            estData = parseData(config.getEst() + date.format(formatter), EST);
+            date = date.plusDays(1);
+            updateMap(dataMap, estData, EST);
+        }
+        List<MovieData> engData = parseData(config.getEng() + date.format(formatter), ENG);
         updateMap(dataMap, engData, ENG);
-        List<MovieData> rusData = parseData(config.getRus(), RUS);
+        List<MovieData> rusData = parseData(config.getRus() + date.format(formatter), RUS);
         updateMap(dataMap, rusData, RUS);
+        Set<String> keys = dataMap.keySet();
+        for (String key : keys) {
+            LocalDate newDate = LocalDate.now();
+            LocalDate stopDate = LocalDate.now();
+            stopDate = stopDate.plusWeeks(1);
+            while (newDate.isBefore(stopDate)) {
+                if (dataMap.get(key).getEngTitle().equalsIgnoreCase("Title is not available")) {
+                    engData = parseData(config.getEng() + newDate.format(formatter), ENG);
+                    updateMap(dataMap, engData, ENG);
+                }
+                if (dataMap.get(key).getRusTitle().equalsIgnoreCase("Название недоступно")) {
+                    rusData = parseData(config.getRus() + newDate.format(formatter), RUS);
+                    updateMap(dataMap, rusData, RUS);
+                }
+                newDate = newDate.plusDays(1);
+            }
+        }
         return dataMap;
     }
 
@@ -104,14 +126,15 @@ public class AdditionalDataParser {
         for (MovieData movie : data) {
             if (dataMap.containsKey(movie.getOriginalTitle())) {
                 MovieData movieData = dataMap.get(movie.getOriginalTitle());
-                if (dataType.equalsIgnoreCase(ENG)) {
+                if (dataType.equalsIgnoreCase(ENG) && movieData.getEngTitle()
+                        .equalsIgnoreCase("Title is not available")) {
                     movieData.setEngTitle(movie.getEngTitle());
                     movieData.setEngGenres(movie.getEngGenres());
-                } else if (dataType.equalsIgnoreCase(RUS)) {
+                } else if (dataType.equalsIgnoreCase(RUS) && movieData.getRusTitle()
+                        .equalsIgnoreCase("Название недоступно")) {
                     movieData.setRusTitle(movie.getRusTitle());
                     movieData.setRusGenres(movie.getRusGenres());
                 }
-                dataMap.replace(movieData.getOriginalTitle(), movieData);
             } else {
                 dataMap.put(movie.getOriginalTitle(), movie);
             }
