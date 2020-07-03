@@ -5,9 +5,13 @@ import cinep.app.cinep.exceptions.MovieTitleNotFoundException;
 import cinep.app.cinep.exceptions.TheatreNotSupportedException;
 import cinep.app.cinep.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = {"/movies", "/films"})
@@ -38,14 +42,19 @@ public class SearchController {
         return searchService.findByTitle(title);
     }
 
+
     @GetMapping("/time")
     public @ResponseBody
-    List<MovieDto> searchByTime(@RequestParam String time) {
-        return searchService.findByTime(time);
+    List<MovieDto> searchByTimeAndDate(@RequestParam(required = false) @DateTimeFormat(pattern = "HH:mm:ss") LocalTime sTime,
+                                       @RequestParam(required = false) @DateTimeFormat(pattern = "HH:mm:ss") LocalTime eTime,
+                                       @RequestParam(required = false) @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate sDate,
+                                       @RequestParam(required = false) @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate eDate) {
+        return searchService.findByTimeAndDate(sTime, eTime, sDate, eDate);
     }
 
     @GetMapping("/genre")
-    public @ResponseBody List<MovieDto> searchByGenres(@RequestParam(name = "g") List<String> genreDesc) {
+    public @ResponseBody
+    List<MovieDto> searchByGenres(@RequestParam(name = "g") List<String> genreDesc) {
         return searchService.findByGenres(genreDesc);
     }
 }

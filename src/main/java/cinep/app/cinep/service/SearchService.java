@@ -3,7 +3,6 @@ package cinep.app.cinep.service;
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.exceptions.MovieTitleNotFoundException;
 import cinep.app.cinep.exceptions.TheatreNotSupportedException;
-import cinep.app.cinep.model.Genre;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.repository.GenreRepository;
 import cinep.app.cinep.repository.MovieRepository;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -23,13 +23,11 @@ import java.util.stream.Collectors;
 public class SearchService {
 
     private final MovieRepository movieRepository;
-    private final GenreRepository genreRepository;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public SearchService(MovieRepository movieRepository, GenreRepository genreRepository, ObjectMapper objectMapper) {
+    public SearchService(MovieRepository movieRepository, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
-        this.genreRepository = genreRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -56,23 +54,33 @@ public class SearchService {
         return objectMapper.convertMovieListToDtoList(movies);
     }
 
-    public List<MovieDto> findByTime(String time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        LocalTime timeToParse = LocalTime.parse(time, formatter);
-        List<Movie> movies = movieRepository.findAll();
-        movies = movies.stream().filter(movie -> Duration.between(timeToParse, movie.getStartTime()).getSeconds() <= 14400 ).collect(Collectors.toList());
+    public List<MovieDto> findByTimeAndDate(LocalTime sTime, LocalTime eTime,
+                                            LocalDate sDate, LocalDate eDate) {
+        if (sTime == null) {
+            LocalTime currentTime = LocalTime.now();
+            sTime = LocalTime.of(currentTime.getHour(), currentTime.getMinute(), currentTime.getSecond());
+        }
+        if (eTime == null) {
+            eTime = LocalTime.parse("23:59:59");
+        }
+        if (sDate == null) {
+            sDate = LocalDate.now();
+        }
+        if (eDate == null) {
+            eDate = sDate;
+        }
+        List<Movie> movies = movieRepository
+                .findMoviesByStartTimeBetweenAndStartDateBetweenOrderByStartTimeAscStartDateAsc(sTime, eTime, sDate, eDate);
         return objectMapper.convertMovieListToDtoList(movies);
     }
 
     public List<MovieDto> findByGenres(List<String> genreDescription) {
         List<Movie> movies = new ArrayList<>();
         for (String desc : genreDescription) {
-         movies.addAll(movieRepository.findByGenre(desc));
+            movies.addAll(movieRepository.findByGenre(desc));
         }
         return objectMapper.convertMovieListToDtoList(movies);
     }
-
-
 
 
 }

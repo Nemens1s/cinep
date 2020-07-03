@@ -1,5 +1,6 @@
 package cinep.app.cinep.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +20,9 @@ public class MovieDto {
     private String theatre;
     private String theatreAuditorium;
     private Integer durationInMinutes;
+    @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate startDate;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
     private String userRating;
     private String showUrl;
