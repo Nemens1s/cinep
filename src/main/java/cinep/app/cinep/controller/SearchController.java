@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = {"/movies", "/films"})
@@ -38,8 +37,9 @@ public class SearchController {
 
     @GetMapping("/title")
     public @ResponseBody
-    List<MovieDto> searchByTitle(@RequestParam String title) throws MovieTitleNotFoundException {
-        return searchService.findByTitle(title);
+    List<MovieDto> searchByTitle(@RequestParam String title,
+                                 @RequestParam (defaultValue = "eng", required = false) String lang) throws MovieTitleNotFoundException {
+        return searchService.findByTitle(title, lang);
     }
 
 
