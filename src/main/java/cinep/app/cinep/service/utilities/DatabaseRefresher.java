@@ -55,7 +55,6 @@ public class DatabaseRefresher {
         Map<String, MovieData> movieData = dataParser.getData();
         addTitlesToMovies(movies, movieData);
         logger.info("Total movies " + movies.size());
-        movies.sort(Comparator.comparing(Movie::getStartDate).thenComparing(Movie::getStartTime));
         movieRepository.saveAll(movies);
         genreService.updateGenres(movies, movieData);
     }

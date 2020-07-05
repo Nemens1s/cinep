@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -21,12 +23,16 @@ public class Genre {
 
     private String description;
 
+    private String lang;
+
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Movie movie;
 
-    public Genre(String description, Movie movie) {
+    public Genre(String description, Movie movie, String lang) {
         this.description = description;
         this.movie = movie;
+        this.lang = lang;
     }
 }

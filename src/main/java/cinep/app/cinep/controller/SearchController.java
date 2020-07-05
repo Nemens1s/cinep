@@ -54,7 +54,7 @@ public class SearchController {
 
     @GetMapping("/genre")
     public @ResponseBody
-    List<MovieDto> searchByGenres(@RequestParam(name = "g") List<String> genreDesc) {
-        return searchService.findByGenres(genreDesc);
+    List<MovieDto> searchByGenres(@RequestParam(name = "g") List<String> genreDesc, @RequestParam String lang) {
+        return searchService.findByGenres(genreDesc, lang);
     }
 }

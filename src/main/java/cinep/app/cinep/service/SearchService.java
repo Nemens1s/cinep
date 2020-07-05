@@ -79,10 +79,10 @@ public class SearchService {
         return objectMapper.convertMovieListToDtoList(movies);
     }
 
-    public List<MovieDto> findByGenres(List<String> genreDescription) {
+    public List<MovieDto> findByGenres(List<String> genreDescription, String lang) {
         List<Movie> movies = new ArrayList<>();
         for (String desc : genreDescription) {
-            movies.addAll(movieRepository.findByGenreOrderByStartTimeAscStartDateAsc(desc));
+            movies.addAll(movieRepository.findByGenreOrderByStartTimeAscStartDateAsc(desc, lang));
         }
         return objectMapper.convertMovieListToDtoList(movies);
     }

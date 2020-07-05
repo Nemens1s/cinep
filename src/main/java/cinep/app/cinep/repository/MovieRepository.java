@@ -23,10 +23,10 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findMoviesByTheatreOrderByStartTimeAscStartDateAsc(String theatre);
 
-    @Query("FROM Movie m INNER JOIN Genre g ON m.id = g.movie.id WHERE g.description = ?1 ")
-    List<Movie> findByGenreOrderByStartTimeAscStartDateAsc(String description);
+    @Query("FROM Movie m INNER JOIN Genre g ON m.id = g.movie.id WHERE g.description = :desc AND g.lang = :lang")
+    List<Movie> findByGenreOrderByStartTimeAscStartDateAsc(@Param("desc") String description, @Param("lang") String lang);
 
-    List<Movie> findMoviesByStartTimeBetweenAndStartDateBetweenOrderByStartTimeAscStartDateAsc(@Param("sTime") LocalTime sTime, @Param("eTime")LocalTime eTime,
-           @Param("sDate")LocalDate sDate, @Param("eDate")LocalDate eDate);
+    List<Movie> findMoviesByStartTimeBetweenAndStartDateBetweenOrderByStartTimeAscStartDateAsc(@Param("sTime") LocalTime sTime, @Param("eTime") LocalTime eTime,
+                                                                                               @Param("sDate") LocalDate sDate, @Param("eDate") LocalDate eDate);
 
 }
