@@ -19,11 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class DatabaseRefresher {
@@ -63,18 +59,21 @@ public class DatabaseRefresher {
         List<Movie> movies = movieRepository.findAll();
         logger.info("Started refreshing database, time is: " + LocalTime.now() + " Currently there are " + movies.size() + " movies");
         if (movies.size() > 0) {
-            LocalTime localTime = LocalTime.now(ZoneId.of("Europe/Tallinn"));
-            List<Movie> result = movies.stream().filter(movie -> movie.getStartTime().isAfter(localTime)).collect(Collectors.toList());
-            movieRepository.deleteAll();
-            ratingService.updateRatings(result);
-            List<Rating> ratings = ratingsRepository.findAll();
-            Map<String, String> ratingsMap = new HashMap<>();
-            ratings.forEach(rating -> ratingsMap.put(rating.getTitle(), rating.getRating()));
-            logger.info("There are " + ratingsMap.size() + " elements in ratings map");
-            result.forEach(movie -> movie.setUserRating(ratingsMap.getOrDefault(movie.getOriginalTitle(), "Currently not available")));
-            logger.info("After refresh there are " + result.size() + " movies left: Current time is " + LocalTime.now());
-            logger.info("FIRST MOVIE ID IS " + result.get(0).getId());
-            movieRepository.saveAll(result);
+            LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/Tallinn"));
+            List<Movie> updatedMovies = new ArrayList<>();
+            for (Movie movie : movies) {
+                if (movie.getStartDate().isAfter(localDateTime.toLocalDate())
+                        || movie.getStartTime().isAfter(localDateTime.toLocalTime())) {
+                    updatedMovies.add(movie);
+                } else {
+                    movieRepository.deleteById(movie.getId());
+                }
+            }
+            ratingService.updateRatings(updatedMovies);
+            setRatingsToMovies(updatedMovies);
+            logger.info("After refresh there are " + updatedMovies.size() + " movies left: Current time is " + LocalTime.now());
+            logger.info("FIRST MOVIE ID IS " + updatedMovies.get(0).getId());
+            movieRepository.saveAll(updatedMovies);
             logger.info("FINISHED REFRESHING DATABASE");
         } else {
             logger.info("There are no movies, skipping refresh");
@@ -82,17 +81,15 @@ public class DatabaseRefresher {
         }
     }
 
-    @Scheduled(cron = "0 0 4 * * ?", zone = "Europe/Tallinn")
-    private void getMoviesToDataBase() {
-        fetchMovies();
+    private void setRatingsToMovies(List<Movie> result) {
+        List<Rating> ratings = ratingsRepository.findAll();
+        Map<String, String> ratingsMap = new HashMap<>();
+        ratings.forEach(rating -> ratingsMap.put(rating.getTitle(), rating.getRating()));
+        logger.info("There are " + ratingsMap.size() + " elements in ratings map");
+        result.forEach(movie -> movie.setUserRating(ratingsMap.getOrDefault(movie.getOriginalTitle(), "Currently not available")));
     }
 
-    @Scheduled(cron = "0 0 * * * *")
-    private void refreshDataBase() {
-        refresh();
-    }
-
-    private void addTitlesToMovies (List<Movie> movies, Map<String, MovieData> movieData) {
+    private void addTitlesToMovies(List<Movie> movies, Map<String, MovieData> movieData) {
         for (Movie movie : movies) {
             if (movieData.containsKey(movie.getOriginalTitle())) {
                 MovieData data = movieData.get(movie.getOriginalTitle());
@@ -101,5 +98,15 @@ public class DatabaseRefresher {
                 movie.setEstonianTitle(data.getEstTitle());
             }
         }
+    }
+
+    @Scheduled(cron = "0 0 4 */3 * ?", zone = "Europe/Tallinn")
+    private void getMoviesToDataBase() {
+        fetchMovies();
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    private void refreshDataBase() {
+        refresh();
     }
 }
