@@ -29,12 +29,12 @@ public class SearchService {
 
 
     public List<MovieDto> findAllMovies() {
-        List<Movie> movies = movieRepository.findAll();
+        List<Movie> movies = movieRepository.findAllMovies();
         return objectMapper.convertMovieListToDtoList(movies);
     }
 
     public List<MovieDto> findByTheatre(String theatreName) throws TheatreNotSupportedException {
-        List<Movie> movies = movieRepository.findMoviesByTheatreOrderByStartTimeAscStartDateAsc(theatreName);
+        List<Movie> movies = movieRepository.findMoviesByTheatre(theatreName);
         if (movies.isEmpty()) {
             throw new TheatreNotSupportedException("This theatre is not supported");
         }
@@ -44,14 +44,14 @@ public class SearchService {
     public List<MovieDto> findByTitle(String title, String lang) throws MovieTitleNotFoundException {
         List<Movie> movies;
         if (lang.equalsIgnoreCase("rus")) {
-            movies = movieRepository.findMoviesByRussianTitleOrderByStartTimeAscStartDateAsc(title);
+            movies = movieRepository.findMoviesByRussianTitle(title);
         } else if (lang.equalsIgnoreCase("est")) {
-            movies = movieRepository.findMoviesByEstonianTitleOrderByStartTimeAscStartDateAsc(title);
+            movies = movieRepository.findMoviesByEstonianTitle(title);
         } else {
-            movies = movieRepository.findMoviesByEnglishTitleOrderByStartTimeAscStartDateAsc(title);
+            movies = movieRepository.findMoviesByEnglishTitle(title);
         }
         if (movies.isEmpty()) {
-            movies = movieRepository.findMoviesByOriginalTitleOrderByStartTimeAscStartDateAsc(title);
+            movies = movieRepository.findMoviesByOriginalTitle(title);
         }
         if (movies.isEmpty()) {
             throw new MovieTitleNotFoundException("There is no movie with that title");
@@ -82,7 +82,7 @@ public class SearchService {
     public List<MovieDto> findByGenres(List<String> genreDescription, String lang) {
         List<Movie> movies = new ArrayList<>();
         for (String desc : genreDescription) {
-            movies.addAll(movieRepository.findByGenreOrderByStartTimeAscStartDateAsc(desc, lang));
+            movies.addAll(movieRepository.findByGenre(desc, lang));
         }
         return objectMapper.convertMovieListToDtoList(movies);
     }

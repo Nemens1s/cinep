@@ -13,18 +13,25 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    List<Movie> findMoviesByRussianTitleOrderByStartTimeAscStartDateAsc(String title);
+    @Query("FROM Movie m ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findAllMovies();
+    @Query("FROM Movie  m WHERE m.russianTitle = :t ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findMoviesByRussianTitle(@Param("t") String title);
 
-    List<Movie> findMoviesByEnglishTitleOrderByStartTimeAscStartDateAsc(String title);
+    @Query("FROM Movie  m WHERE m.englishTitle = :t ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findMoviesByEnglishTitle(@Param("t") String title);
 
-    List<Movie> findMoviesByEstonianTitleOrderByStartTimeAscStartDateAsc(String title);
+    @Query("FROM Movie  m WHERE m.estonianTitle = :t ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findMoviesByEstonianTitle(@Param("t") String title);
 
-    List<Movie> findMoviesByOriginalTitleOrderByStartTimeAscStartDateAsc(String title);
+    @Query("FROM Movie  m WHERE m.originalTitle = :t ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findMoviesByOriginalTitle(@Param("t") String title);
 
-    List<Movie> findMoviesByTheatreOrderByStartTimeAscStartDateAsc(String theatre);
+    @Query("FROM Movie  m WHERE  m.theatre = :t ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findMoviesByTheatre(@Param("t") String theatre);
 
-    @Query("FROM Movie m INNER JOIN Genre g ON m.id = g.movie.id WHERE g.description = :desc AND g.lang = :lang")
-    List<Movie> findByGenreOrderByStartTimeAscStartDateAsc(@Param("desc") String description, @Param("lang") String lang);
+    @Query("FROM Movie m INNER JOIN Genre g ON m.id = g.movie.id WHERE g.description = :desc AND g.lang = :lang ORDER BY m.startDate ASC, m.startTime ASC")
+    List<Movie> findByGenre(@Param("desc") String description, @Param("lang") String lang);
 
     List<Movie> findMoviesByStartTimeBetweenAndStartDateBetweenOrderByStartTimeAscStartDateAsc(@Param("sTime") LocalTime sTime, @Param("eTime") LocalTime eTime,
                                                                                                @Param("sDate") LocalDate sDate, @Param("eDate") LocalDate eDate);
