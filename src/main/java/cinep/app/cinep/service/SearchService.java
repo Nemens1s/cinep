@@ -43,6 +43,7 @@ public class SearchService {
 
     public List<MovieDto> findByTitle(String title, String lang) throws MovieTitleNotFoundException {
         List<Movie> movies;
+        title = title.toLowerCase();
         if (lang.equalsIgnoreCase("rus")) {
             movies = movieRepository.findMoviesByRussianTitle(title);
         } else if (lang.equalsIgnoreCase("est")) {
