@@ -57,19 +57,19 @@ public class MovieSpecification {
                             .or(withTheatre(new SearchCriteria("theatre", theatres[i])));
                 }
                 specifications.add(theatreSpecification);
-            } else if (key.equalsIgnoreCase("startT") || key.equalsIgnoreCase("endT")) {
+            } else if (key.equalsIgnoreCase("startTime") || key.equalsIgnoreCase("endTime")) {
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
                 LocalTime time = LocalTime.parse(request.get(key), timeFormatter);
-                String criteriaKey = key.equalsIgnoreCase("startT") ? "start" : "end";
+                String criteriaKey = key.equalsIgnoreCase("startTime") ? "start" : "end";
                 specifications.add(withTime(new SearchCriteria(criteriaKey, time)));
                 if (!request.containsKey("endD") && !request.containsKey("startD")) {
                     specifications.add(withDate(new SearchCriteria("startD", LocalDate.now())));
                     specifications.add(withDate(new SearchCriteria("endD", LocalDate.now())));
                 }
-            } else if (key.equalsIgnoreCase("startD") || key.equalsIgnoreCase("endD")) {
+            } else if (key.equalsIgnoreCase("startDate") || key.equalsIgnoreCase("endDate")) {
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
                 LocalDate date = LocalDate.parse(request.get(key), dateFormatter);
-                String criteriaKey = key.equalsIgnoreCase("startD") ? "start" : "end";
+                String criteriaKey = key.equalsIgnoreCase("startDate") ? "start" : "end";
                 specifications.add(withDate(new SearchCriteria(criteriaKey, date)));
             }
 

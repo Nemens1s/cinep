@@ -1,6 +1,5 @@
 package cinep.app.cinep.security;
 
-import cinep.app.cinep.model.Movie;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
