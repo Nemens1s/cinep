@@ -1,13 +1,10 @@
-package cinep.app.cinep.service.utilities;
+package cinep.app.cinep.service;
 
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.Rating;
 import cinep.app.cinep.pojo.MovieData;
 import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.RatingsRepository;
-import cinep.app.cinep.service.GenreService;
-import cinep.app.cinep.service.RatingService;
-import cinep.app.cinep.service.SearchService;
 import cinep.app.cinep.service.parsers.AdditionalDataParser;
 import cinep.app.cinep.service.parsers.ScheduleParser;
 import org.slf4j.Logger;
@@ -22,7 +19,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Service
-public class DatabaseRefresher {
+public class MovieService {
 
     private final ScheduleParser scheduleParser;
     private final AdditionalDataParser dataParser;
@@ -33,9 +30,9 @@ public class DatabaseRefresher {
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
     @Autowired
-    public DatabaseRefresher(ScheduleParser scheduleParser, AdditionalDataParser dataParser, RatingService ratingService,
-                             MovieRepository movieRepository, RatingsRepository ratingsRepository,
-                             GenreService genreService) {
+    public MovieService(ScheduleParser scheduleParser, AdditionalDataParser dataParser, RatingService ratingService,
+                        MovieRepository movieRepository, RatingsRepository ratingsRepository,
+                        GenreService genreService) {
         this.scheduleParser = scheduleParser;
         this.dataParser = dataParser;
         this.ratingService = ratingService;
@@ -60,6 +57,7 @@ public class DatabaseRefresher {
         logger.info("Started refreshing database, time is: " + LocalTime.now() + " Currently there are " + movies.size() + " movies");
         if (movies.size() > 0) {
             LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/Tallinn"));
+
             List<Movie> updatedMovies = new ArrayList<>();
             for (Movie movie : movies) {
                 if (movie.getStartDate().isAfter(localDateTime.toLocalDate())

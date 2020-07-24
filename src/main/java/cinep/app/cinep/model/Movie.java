@@ -6,7 +6,10 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "movies")
@@ -24,9 +27,12 @@ public class Movie {
     private String theatre;
     private String theatreAuditorium;
     private Integer durationInMinutes;
-    private LocalDate startDate;
     private LocalTime startTime;
+    private LocalDate startDate;
     private String userRating;
     private String showUrl;
     private String productionYear = "";
+
+    @OneToMany(mappedBy = "movie")
+    private List<Genre> genres = new ArrayList<>();
 }

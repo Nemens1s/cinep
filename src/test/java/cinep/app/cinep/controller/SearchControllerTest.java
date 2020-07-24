@@ -56,29 +56,29 @@ public class SearchControllerTest {
     @Resource
     private TestRestTemplate template;
 
-    @Test
-    public void searchAllMoviesReturnsListOfMovies(){
-        ResponseEntity<List<MovieDto>> entity = template.exchange("/movies/all", HttpMethod.GET, null, MOVIES_LIST);
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
-        List<MovieDto> movieDtos = entity.getBody();
-        assertTrue(isNotEmpty(movieDtos));
-    }
-
-    @Test
-    public void searchByTitleReturnsListOfMovies(){
-        ResponseEntity<List<MovieDto>> entity = template.exchange("/movies/title?title=Star Wars", HttpMethod.GET, null, MOVIES_LIST);
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
-        List<MovieDto> movieDtos = entity.getBody();
-        assertTrue(isNotEmpty(movieDtos));
-        assertTrue(movieDtos.stream().anyMatch(movieDto -> movieDto.getOriginalTitle().equalsIgnoreCase("Star Wars")));
-    }
-
-    @Test
-    public void searchByTheatreReturnsListOfMovies(){
-        ResponseEntity<List<MovieDto>> entity = template.exchange("/movies/theatre?theatre=Kosmos", HttpMethod.GET, null, MOVIES_LIST);
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
-        List<MovieDto> movieDtos = entity.getBody();
-        assertTrue(isNotEmpty(movieDtos));
-    }
+//    @Test
+//    public void searchAllMoviesReturnsListOfMovies(){
+//        ResponseEntity<List<MovieDto>> entity = template.exchange("/movies/all", HttpMethod.GET, null, MOVIES_LIST);
+//        assertEquals(HttpStatus.OK, entity.getStatusCode());
+//        List<MovieDto> movieDtos = entity.getBody();
+//        assertTrue(isNotEmpty(movieDtos));
+//    }
+//
+//    @Test
+//    public void searchByTitleReturnsListOfMovies(){
+//        ResponseEntity<List<MovieDto>> entity = template.exchange("/movies/title?title=Star Wars", HttpMethod.GET, null, MOVIES_LIST);
+//        assertEquals(HttpStatus.OK, entity.getStatusCode());
+//        List<MovieDto> movieDtos = entity.getBody();
+//        assertTrue(isNotEmpty(movieDtos));
+//        assertTrue(movieDtos.stream().anyMatch(movieDto -> movieDto.getOriginalTitle().equalsIgnoreCase("Star Wars")));
+//    }
+//
+//    @Test
+//    public void searchByTheatreReturnsListOfMovies(){
+//        ResponseEntity<List<MovieDto>> entity = template.exchange("/movies/theatre?theatre=Kosmos", HttpMethod.GET, null, MOVIES_LIST);
+//        assertEquals(HttpStatus.OK, entity.getStatusCode());
+//        List<MovieDto> movieDtos = entity.getBody();
+//        assertTrue(isNotEmpty(movieDtos));
+//    }
 
 }

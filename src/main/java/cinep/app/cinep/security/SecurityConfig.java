@@ -50,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/movies/*").permitAll()
+                .antMatchers("/movies").permitAll()
                 .antMatchers("/genre/all").permitAll()
                 .antMatchers("/h2/*").permitAll()
                 .antMatchers("/profile/register").permitAll()

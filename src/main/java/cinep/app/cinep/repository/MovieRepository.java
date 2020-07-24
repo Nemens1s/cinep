@@ -2,6 +2,7 @@ package cinep.app.cinep.repository;
 
 import cinep.app.cinep.model.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,8 +12,9 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Repository
-public interface MovieRepository extends JpaRepository<Movie, Long> {
+public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecificationExecutor<Movie> {
 
+    /*
     @Query("FROM Movie m ORDER BY m.startDate ASC, m.startTime ASC")
     List<Movie> findAllMovies();
 
@@ -36,5 +38,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findMoviesByStartTimeBetweenAndStartDateBetweenOrderByStartTimeAscStartDateAsc(@Param("sTime") LocalTime sTime, @Param("eTime") LocalTime eTime,
                                                                                                @Param("sDate") LocalDate sDate, @Param("eDate") LocalDate eDate);
-
+     */
 }

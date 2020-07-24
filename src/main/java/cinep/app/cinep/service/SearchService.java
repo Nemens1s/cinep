@@ -1,17 +1,15 @@
 package cinep.app.cinep.service;
 
 import cinep.app.cinep.dto.MovieDto;
-import cinep.app.cinep.exceptions.MovieTitleNotFoundException;
-import cinep.app.cinep.exceptions.TheatreNotSupportedException;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.service.utilities.ObjectMapper;
+import cinep.app.cinep.specifications.MovieSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 
 
@@ -28,13 +26,25 @@ public class SearchService {
     }
 
 
+    public List<MovieDto> search(Map<String, String> request) {
+        Specification<Movie> specification = MovieSpecification.createSpecification(request);
+        List<Movie> movies = movieRepository.findAll(specification);
+        return objectMapper.convertMovieListToDtoList(movies);
+    }
+
+
+
+    /*
     public List<MovieDto> findAllMovies() {
         List<Movie> movies = movieRepository.findAllMovies();
         return objectMapper.convertMovieListToDtoList(movies);
     }
 
-    public List<MovieDto> findByTheatre(String theatreName) throws TheatreNotSupportedException {
-        List<Movie> movies = movieRepository.findMoviesByTheatre(theatreName);
+    public List<MovieDto> findByTheatre(List<String> theatres) throws TheatreNotSupportedException {
+        List<Movie> movies = new ArrayList<>();
+        for (String theatre : theatres) {
+            movies.addAll(movieRepository.findMoviesByTheatre(theatre));
+        }
         if (movies.isEmpty()) {
             throw new TheatreNotSupportedException("This theatre is not supported");
         }
@@ -87,6 +97,8 @@ public class SearchService {
         }
         return objectMapper.convertMovieListToDtoList(movies);
     }
+
+    */
 
 
 }

@@ -1,16 +1,11 @@
 package cinep.app.cinep.controller;
 
 import cinep.app.cinep.dto.MovieDto;
-import cinep.app.cinep.exceptions.MovieTitleNotFoundException;
-import cinep.app.cinep.exceptions.TheatreNotSupportedException;
 import cinep.app.cinep.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = {"/movies", "/films"})
@@ -23,6 +18,16 @@ public class SearchController {
         this.searchService = searchService;
     }
 
+    @GetMapping()
+    public @ResponseBody List<MovieDto> search(@RequestParam Map<String, String> searchRequest) {
+        return searchService.search(searchRequest);
+    }
+
+    /*
+    This part of code is replaced with the method that is above because adding new parameters for searching became
+    difficult as well as there is no option to search by different parameters.
+    For example if a person wants to see "Star Wars" but he prefers two or three cinemas then he cant do it in a one
+    search
     @GetMapping("/all")
     public @ResponseBody
     List<MovieDto> findAll() {
@@ -31,8 +36,8 @@ public class SearchController {
 
     @GetMapping("/theatre")
     public @ResponseBody
-    List<MovieDto> searchByTheatreName(@RequestParam String theatre) throws TheatreNotSupportedException {
-        return searchService.findByTheatre(theatre);
+    List<MovieDto> searchByTheatreName(@RequestParam List<String> theatres) throws TheatreNotSupportedException {
+        return searchService.findByTheatre(theatres);
     }
 
     @GetMapping("/title")
@@ -57,4 +62,5 @@ public class SearchController {
     List<MovieDto> searchByGenres(@RequestParam(name = "g") List<String> genreDesc, @RequestParam String lang) {
         return searchService.findByGenres(genreDesc, lang);
     }
+    */
 }
