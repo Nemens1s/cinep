@@ -57,7 +57,7 @@ public class UserController {
         return userService.addToBookmarks(movieId, cinepUser.getUsername());
     }
 
-    @DeleteMapping(value = "/bookmarks/delete/{title}")
+    @DeleteMapping(value = "/bookmarks/delete/{movieId}")
     @Secured(Roles.USER)
     public HttpStatus removeBookmark(@PathVariable Long movieId){
         CinepUser cinepUser = current();

@@ -1,38 +1,13 @@
 package cinep.app.cinep.service.utilities;
 
-import cinep.app.cinep.dto.GenreDto;
-import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.dto.UserDto;
-import cinep.app.cinep.model.Genre;
-import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class ObjectMapper {
 
-    public MovieDto convertMovieToDto(Movie movie) {
-        MovieDto movieDto = new MovieDto();
-        movieDto.setOriginalTitle(movie.getOriginalTitle());
-        movieDto.setUserRating(movie.getUserRating());
-        movieDto.setTheatreAuditorium(movie.getTheatreAuditorium());
-        movieDto.setTheatre(movie.getTheatre());
-        movieDto.setShowUrl(movie.getShowUrl());
-        movieDto.setId(movie.getId());
-        movieDto.setStartDate(movie.getStartDate());
-        movieDto.setStartTime(movie.getStartTime());
-        movieDto.setDurationInMinutes(movie.getDurationInMinutes());
-        movieDto.setProductionYear(movie.getProductionYear());
-        movieDto.setEstonianTitle(movie.getEstonianTitle());
-        movieDto.setEnglishTitle(movie.getEnglishTitle());
-        movieDto.setRussianTitle(movie.getRussianTitle());
-        return movieDto;
-    }
 
     public UserDto convertUserToDto(User user) {
         UserDto userDto = new UserDto();
@@ -51,54 +26,4 @@ public class ObjectMapper {
         return user;
     }
 
-
-    public Movie convertDtoToMovie(MovieDto movieDto) {
-        Movie movie = new Movie();
-        movie.setOriginalTitle(movieDto.getOriginalTitle());
-        movie.setUserRating(movieDto.getUserRating());
-        movie.setTheatreAuditorium(movieDto.getTheatreAuditorium());
-        movie.setTheatre(movieDto.getTheatre());
-        movie.setShowUrl(movieDto.getShowUrl());
-        movie.setId(movieDto.getId());
-        movie.setStartDate(movieDto.getStartDate());
-        movie.setStartTime(movieDto.getStartTime());
-        movie.setDurationInMinutes(movieDto.getDurationInMinutes());
-        movie.setProductionYear(movieDto.getProductionYear());
-        movie.setEstonianTitle(movieDto.getEstonianTitle());
-        movie.setEnglishTitle(movieDto.getEnglishTitle());
-        movie.setRussianTitle(movieDto.getRussianTitle());
-        return movie;
-    }
-
-
-    public Set<Movie> convertDtoSetToMovieSet(Set<MovieDto> movieDtoSet) {
-        Set<Movie> movieSet = new HashSet<>();
-        for (MovieDto movieDto : movieDtoSet) {
-            Movie movie = convertDtoToMovie(movieDto);
-            movieSet.add(movie);
-        }
-        return movieSet;
-    }
-
-
-    public Set<MovieDto> convertMovieSetToDtoSet(Set<Movie> movieSet) {
-        Set<MovieDto> movieDtoSet = new HashSet<>();
-        for (Movie movie : movieSet) {
-            MovieDto movieDto = convertMovieToDto(movie);
-            movieDtoSet.add(movieDto);
-        }
-        return movieDtoSet;
-    }
-
-    public List<MovieDto> convertMovieListToDtoList(List<Movie> movies) {
-        List<MovieDto> movieDtos = new ArrayList<>();
-        movies.forEach(movie -> movieDtos.add(convertMovieToDto(movie)));
-        return movieDtos;
-    }
-
-    public GenreDto convertGenreToDto(Genre genre) {
-        GenreDto genreDto = new GenreDto();
-        genreDto.setDescription(genre.getDescription());
-        return genreDto;
-    }
 }

@@ -3,7 +3,11 @@ package cinep.app.cinep.controller;
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +23,9 @@ public class SearchController {
     }
 
     @GetMapping()
-    public @ResponseBody List<MovieDto> search(@RequestParam Map<String, String> searchRequest) {
-        return searchService.search(searchRequest);
+    public @ResponseBody
+    Page<MovieDto> search(@RequestParam Map<String, String> searchRequest, Pageable pageable) {
+        return searchService.search(searchRequest, pageable);
     }
 
     /*

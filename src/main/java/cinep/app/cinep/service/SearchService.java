@@ -6,6 +6,10 @@ import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.service.utilities.ObjectMapper;
 import cinep.app.cinep.specifications.MovieSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -17,20 +21,19 @@ import java.util.*;
 public class SearchService {
 
     private final MovieRepository movieRepository;
-    private final ObjectMapper objectMapper;
 
     @Autowired
-    public SearchService(MovieRepository movieRepository, ObjectMapper objectMapper) {
+    public SearchService(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
-        this.objectMapper = objectMapper;
     }
 
-
-    public List<MovieDto> search(Map<String, String> request) {
+    public Page<MovieDto> search(Map<String, String> request, Pageable pageable) {
         Specification<Movie> specification = MovieSpecification.createSpecification(request);
-        List<Movie> movies = movieRepository.findAll(specification);
-        return objectMapper.convertMovieListToDtoList(movies);
+        pageable = PageRequest.of(pageable.getPageNumber(),
+                pageable.getPageSize(), Sort.by("startDate").ascending().and(Sort.by("startTime").ascending()));
+        return movieRepository.findAll(specification, pageable).map(MovieDto::new);
     }
+
 
 
 
