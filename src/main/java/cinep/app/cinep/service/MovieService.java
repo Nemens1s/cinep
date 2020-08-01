@@ -7,12 +7,14 @@ import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.RatingsRepository;
 import cinep.app.cinep.service.parsers.AdditionalDataParser;
 import cinep.app.cinep.service.parsers.ScheduleParser;
+import cinep.app.cinep.service.utilities.SimilarityComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -42,7 +44,8 @@ public class MovieService {
     }
 
     public void fetchMovies() {
-        logger.info("Getting new movies to database: Time is " + LocalDateTime.now());
+        LocalTime start = LocalTime.now();
+        logger.info("Getting new movies to database: Time is " + start);
         movieRepository.deleteAll();
         List<Movie> movies = scheduleParser.getMoviesFromAPI();
         Map<String, MovieData> movieData = dataParser.getData();
@@ -50,11 +53,14 @@ public class MovieService {
         logger.info("Total movies " + movies.size());
         movieRepository.saveAll(movies);
         genreService.updateGenres(movies, movieData);
+        LocalTime end = LocalTime.now();
+        logger.info(String.format("Total time: %s seconds", Duration.between(start, end).getSeconds()));
     }
 
     public void refresh() {
         List<Movie> movies = movieRepository.findAll();
-        logger.info("Started refreshing database, time is: " + LocalTime.now() + " Currently there are " + movies.size() + " movies");
+        logger.info(String.format("Started refreshing database, time is: %tR Currently there are %d movies",
+                LocalTime.now(), movies.size()));
         if (movies.size() > 0) {
             LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/Tallinn"));
 
@@ -69,8 +75,9 @@ public class MovieService {
             }
             ratingService.updateRatings(updatedMovies);
             setRatingsToMovies(updatedMovies);
-            logger.info("After refresh there are " + updatedMovies.size() + " movies left: Current time is " + LocalTime.now());
-            logger.info("FIRST MOVIE ID IS " + updatedMovies.get(0).getId());
+            logger.info(String.format("After refresh there are %d  movies left: Current time is %tR",
+                    updatedMovies.size(), LocalTime.now()));
+            logger.info(String.format("First movie id is %d", updatedMovies.get(0).getId()));
             movieRepository.saveAll(updatedMovies);
             logger.info("FINISHED REFRESHING DATABASE");
         } else {
@@ -89,11 +96,13 @@ public class MovieService {
 
     private void addTitlesToMovies(List<Movie> movies, Map<String, MovieData> movieData) {
         for (Movie movie : movies) {
-            if (movieData.containsKey(movie.getOriginalTitle())) {
-                MovieData data = movieData.get(movie.getOriginalTitle());
+            Optional<String> title = movieData.keySet().stream()
+                    .filter(s -> SimilarityComparator.similarity(s, movie.getOriginalTitle()))
+                    .findFirst();
+            if (title.isPresent()) {
+                MovieData data = movieData.get(title.get());
                 movie.setRussianTitle(data.getRusTitle());
                 movie.setEnglishTitle(data.getEngTitle());
-                movie.setEstonianTitle(data.getEstTitle());
             }
         }
     }

@@ -71,11 +71,7 @@ public class ScheduleParser {
                         movie.setId(Long.parseLong(xmlEvent.asCharacters().getData()));
                     } else if (startElement.getName().getLocalPart().equalsIgnoreCase("OriginalTitle")) {
                         xmlEvent = xmlEventReader.nextEvent();
-                        String title = xmlEvent.asCharacters().getData();
-                        title = title.replaceAll("\\(.*", "");
-                        title = title.replaceAll("3D", "");
-                        title = title.replaceAll("2D", "");
-                        movie.setOriginalTitle(title.trim());
+                        movie.setOriginalTitle(xmlEvent.asCharacters().getData());
                     } else if (startElement.getName().getLocalPart().equalsIgnoreCase("theatre")) {
                         xmlEvent = xmlEventReader.nextEvent();
                         movie.setTheatre(xmlEvent.asCharacters().getData());

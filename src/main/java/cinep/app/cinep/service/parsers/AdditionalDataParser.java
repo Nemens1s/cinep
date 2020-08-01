@@ -2,6 +2,7 @@ package cinep.app.cinep.service.parsers;
 
 import cinep.app.cinep.config.ApiConfig;
 import cinep.app.cinep.pojo.MovieData;
+import cinep.app.cinep.service.utilities.SimilarityComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,15 +35,18 @@ public class AdditionalDataParser {
         Map<String, MovieData> dataMap = new HashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate date = LocalDate.now();
-        List<MovieData> estData = parseData(config.getEst() + date.format(formatter), EST);
-        while (!date.isEqual(LocalDate.now().plusDays(10))) {
-            estData = parseData(config.getEst() + date.format(formatter), EST);
+        List<MovieData> estData;
+        while (!date.isEqual(LocalDate.now().plusWeeks(1))) {
+            estData = parseData(config.getEstForum() + date.format(formatter), EST);
+            estData.addAll(parseData(config.getEstApollo() + date.format(formatter), EST));
             date = date.plusDays(1);
             updateMap(dataMap, estData, EST);
         }
-        List<MovieData> engData = parseData(config.getEng() + date.format(formatter), ENG);
+        List<MovieData> engData = parseData(config.getEngForum() + date.format(formatter), ENG);
+        engData.addAll(parseData(config.getEngApollo() + date.format(formatter), ENG));
         updateMap(dataMap, engData, ENG);
-        List<MovieData> rusData = parseData(config.getRus() + date.format(formatter), RUS);
+        List<MovieData> rusData = parseData(config.getRusForum() + date.format(formatter), RUS);
+        rusData.addAll(parseData(config.getRusApollo() + date.format(formatter), RUS));
         updateMap(dataMap, rusData, RUS);
         Set<String> keys = dataMap.keySet();
         for (String key : keys) {
@@ -51,11 +55,13 @@ public class AdditionalDataParser {
             stopDate = stopDate.plusWeeks(1);
             while (newDate.isBefore(stopDate)) {
                 if (dataMap.get(key).getEngTitle().equalsIgnoreCase("Title is not available")) {
-                    engData = parseData(config.getEng() + newDate.format(formatter), ENG);
+                    engData = parseData(config.getEngForum() + newDate.format(formatter), ENG);
+                    engData.addAll(parseData(config.getEngApollo() + newDate.format(formatter), ENG));
                     updateMap(dataMap, engData, ENG);
                 }
                 if (dataMap.get(key).getRusTitle().equalsIgnoreCase("Название недоступно")) {
-                    rusData = parseData(config.getRus() + newDate.format(formatter), RUS);
+                    rusData = parseData(config.getRusForum() + newDate.format(formatter), RUS);
+                    rusData.addAll(parseData(config.getRusApollo() + newDate.format(formatter), RUS));
                     updateMap(dataMap, rusData, RUS);
                 }
                 newDate = newDate.plusDays(1);
@@ -65,7 +71,7 @@ public class AdditionalDataParser {
     }
 
 
-    private List<MovieData> parseData(String url, String dataType) {
+    private List<MovieData> parseData(String url, String lang) {
         XMLInputFactory factory = XMLInputFactory.newInstance();
         List<MovieData> data = new ArrayList<>();
         try {
@@ -78,28 +84,21 @@ public class AdditionalDataParser {
                         StartElement startElement = xmlEvent.asStartElement();
                         if (startElement.getName().getLocalPart().equalsIgnoreCase("OriginalTitle")) {
                             xmlEvent = xmlEventReader.nextEvent();
-                            String title = xmlEvent.asCharacters().getData();
-                            title = title.replaceAll("\\(.*", "").replaceAll("3D", "")
-                                    .replaceAll("2D", "");
-                            movieData.setOriginalTitle(title.trim());
+                            movieData.setOriginalTitle(xmlEvent.asCharacters().getData());
                         } else if (startElement.getName().getLocalPart().equalsIgnoreCase("title")) {
                             xmlEvent = xmlEventReader.nextEvent();
                             String title = xmlEvent.asCharacters().getData();
-                            title = title.replaceAll("\\(.*", "").replaceAll("3D", "")
-                                    .replaceAll("2D", "");
-                            if (dataType.equalsIgnoreCase(EST)) {
-                                movieData.setEstTitle(title);
-                            } else if (dataType.equalsIgnoreCase(ENG)) {
+                            if (lang.equalsIgnoreCase(ENG) && movieData.getEngTitle().equals("Title is not available")) {
                                 movieData.setEngTitle(title);
-                            } else {
+                            } else if (lang.equalsIgnoreCase(RUS) && movieData.getRusTitle().equals("Название недоступно")) {
                                 movieData.setRusTitle(title);
                             }
                         } else if (startElement.getName().getLocalPart().equalsIgnoreCase("Genres")) {
                             xmlEvent = xmlEventReader.nextEvent();
                             String genres = xmlEvent.asCharacters().getData();
-                            if (dataType.equalsIgnoreCase(EST)) {
+                            if (lang.equalsIgnoreCase(EST)) {
                                 movieData.setEstGenres(genres);
-                            } else if (dataType.equalsIgnoreCase(ENG)) {
+                            } else if (lang.equalsIgnoreCase(ENG)) {
                                 movieData.setEngGenres(genres);
                             } else {
                                 movieData.setRusGenres(genres);
@@ -124,8 +123,10 @@ public class AdditionalDataParser {
 
     private void updateMap(Map<String, MovieData> dataMap, List<MovieData> data, String dataType) {
         for (MovieData movie : data) {
-            if (dataMap.containsKey(movie.getOriginalTitle())) {
-                MovieData movieData = dataMap.get(movie.getOriginalTitle());
+            Optional<String> title = dataMap.keySet()
+                    .stream().filter(s -> SimilarityComparator.similarity(s, movie.getOriginalTitle())).findFirst();
+            if (title.isPresent()) {
+                MovieData movieData = dataMap.get(title.get());
                 if (dataType.equalsIgnoreCase(ENG) && movieData.getEngTitle()
                         .equalsIgnoreCase("Title is not available")) {
                     movieData.setEngTitle(movie.getEngTitle());
@@ -140,6 +141,4 @@ public class AdditionalDataParser {
             }
         }
     }
-
-
 }

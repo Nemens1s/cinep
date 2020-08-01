@@ -11,7 +11,12 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties (prefix = "app.api")
 public class ApiConfig {
     private String url;
-    private String rus;
-    private String eng;
-    private String est;
+    private String rusForum;
+    private String engForum;
+    private String estForum;
+    private String rusApollo;
+    private String engApollo;
+    private String estApollo;
+    private String t1En;
+    private String t1Ru;
 }

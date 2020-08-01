@@ -5,12 +5,14 @@ import cinep.app.cinep.model.Genre;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.pojo.MovieData;
 import cinep.app.cinep.repository.GenreRepository;
+import cinep.app.cinep.service.utilities.SimilarityComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class GenreService {
@@ -30,8 +32,11 @@ public class GenreService {
         List<Genre> genres = new ArrayList<>();
         genreRepository.deleteAll();
         for (Movie movie : movies) {
-            if (movieDataMap.containsKey(movie.getOriginalTitle())) {
-                MovieData data = movieDataMap.get(movie.getOriginalTitle());
+            Optional<String> title = movieDataMap.keySet().stream()
+                    .filter(s -> SimilarityComparator.similarity(s, movie.getOriginalTitle()))
+                    .findFirst();
+            if (title.isPresent()) {
+                MovieData data = movieDataMap.get(title.get());
                 addGenreToList(genres,data.getEstGenres().split(",") ,movie, "est");
                 addGenreToList(genres,data.getEngGenres().split(",") ,movie, "eng");
                 addGenreToList(genres,data.getRusGenres().split(",") ,movie, "rus");
