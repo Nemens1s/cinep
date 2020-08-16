@@ -11,8 +11,8 @@ import cinep.app.cinep.security.*;
 import cinep.app.cinep.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -52,26 +52,26 @@ public class UserController {
 
     @PostMapping(value = "/bookmarks/add")
     @Secured(Roles.USER)
-    public Set<Movie> addToBookmarks(@RequestBody Long movieId) throws UserNotFoundException, MovieAlreadyInBookmarksException {
+    public Set<Movie> addToBookmarks(@RequestBody Long id) throws UserNotFoundException, MovieAlreadyInBookmarksException {
         CinepUser cinepUser = current();
-        return userService.addToBookmarks(movieId, cinepUser.getUsername());
+        return userService.addToBookmarks(id, cinepUser.getUsername());
     }
 
     @DeleteMapping(value = "/bookmarks/delete/{movieId}")
     @Secured(Roles.USER)
-    public HttpStatus removeBookmark(@PathVariable Long movieId){
+    public ResponseEntity<Long> removeBookmark(@PathVariable Long movieId){
         CinepUser cinepUser = current();
         userService.removeBookmark(movieId, cinepUser.getUsername());
-        return HttpStatus.OK;
+        return new ResponseEntity<>(movieId, HttpStatus.RESET_CONTENT);
     }
 
     @PostMapping("/register")
-    public UserDto register(@RequestBody UserDto userDto) throws UserAlreadyInDatabaseException {
+    public ResponseEntity<UserDto> register(@RequestBody UserDto userDto) throws UserAlreadyInDatabaseException {
         HttpStatus status = userService.register(userDto);
         if(status.equals(HttpStatus.CREATED)){
-            return userDto;
+            return new ResponseEntity<>(userDto, HttpStatus.CREATED);
         }
-        return null;
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/login")

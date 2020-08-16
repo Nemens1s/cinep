@@ -23,16 +23,14 @@ public class Genre {
 
     private String description;
 
-    private String lang;
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Movie movie;
 
-    public Genre(String description, Movie movie, String lang) {
+    public Genre(String description, Movie movie) {
         this.description = description;
         this.movie = movie;
-        this.lang = lang;
     }
 }

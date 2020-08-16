@@ -57,19 +57,19 @@ public class MovieSpecification {
                             .or(withTheatre(new SearchCriteria("theatre", theatres[i])));
                 }
                 specifications.add(theatreSpecification);
-            } else if (key.equalsIgnoreCase("startTime") || key.equalsIgnoreCase("endTime")) {
+            } else if (key.equalsIgnoreCase("st") || key.equalsIgnoreCase("et")) {
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
                 LocalTime time = LocalTime.parse(request.get(key), timeFormatter);
-                String criteriaKey = key.equalsIgnoreCase("startTime") ? "start" : "end";
+                String criteriaKey = key.equalsIgnoreCase("st") ? "start" : "end";
                 specifications.add(withTime(new SearchCriteria(criteriaKey, time)));
-                if (!request.containsKey("endD") && !request.containsKey("startD")) {
+                if (!request.containsKey("ed") && !request.containsKey("sd")) {
                     specifications.add(withDate(new SearchCriteria("startD", LocalDate.now())));
                     specifications.add(withDate(new SearchCriteria("endD", LocalDate.now())));
                 }
-            } else if (key.equalsIgnoreCase("startDate") || key.equalsIgnoreCase("endDate")) {
+            } else if (key.equalsIgnoreCase("sd") || key.equalsIgnoreCase("ed")) {
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
                 LocalDate date = LocalDate.parse(request.get(key), dateFormatter);
-                String criteriaKey = key.equalsIgnoreCase("startDate") ? "start" : "end";
+                String criteriaKey = key.equalsIgnoreCase("sd") ? "start" : "end";
                 specifications.add(withDate(new SearchCriteria(criteriaKey, date)));
             }
 
@@ -91,6 +91,7 @@ public class MovieSpecification {
     private static Specification<Movie> withGenre(SearchCriteria criteria) {
         return (Specification<Movie>) (root, query, builder) -> {
             ListJoin<Movie, Genre> join = root.joinList(Movie_.GENRES);
+            query.distinct(true);
             return builder.equal(builder.lower(join.get(criteria.getKey())), criteria.getValue().toString().toLowerCase());
         };
     }

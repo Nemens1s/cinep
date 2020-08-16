@@ -121,17 +121,17 @@ public class AdditionalDataParser {
         return data;
     }
 
-    private void updateMap(Map<String, MovieData> dataMap, List<MovieData> data, String dataType) {
+    private void updateMap(Map<String, MovieData> dataMap, List<MovieData> data, String language) {
         for (MovieData movie : data) {
             Optional<String> title = dataMap.keySet()
                     .stream().filter(s -> SimilarityComparator.similarity(s, movie.getOriginalTitle())).findFirst();
             if (title.isPresent()) {
                 MovieData movieData = dataMap.get(title.get());
-                if (dataType.equalsIgnoreCase(ENG) && movieData.getEngTitle()
+                if (language.equalsIgnoreCase(ENG) && movieData.getEngTitle()
                         .equalsIgnoreCase("Title is not available")) {
                     movieData.setEngTitle(movie.getEngTitle());
                     movieData.setEngGenres(movie.getEngGenres());
-                } else if (dataType.equalsIgnoreCase(RUS) && movieData.getRusTitle()
+                } else if (language.equalsIgnoreCase(RUS) && movieData.getRusTitle()
                         .equalsIgnoreCase("Название недоступно")) {
                     movieData.setRusTitle(movie.getRusTitle());
                     movieData.setRusGenres(movie.getRusGenres());

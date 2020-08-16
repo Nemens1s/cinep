@@ -37,22 +37,22 @@ public class GenreService {
                     .findFirst();
             if (title.isPresent()) {
                 MovieData data = movieDataMap.get(title.get());
-                addGenreToList(genres,data.getEstGenres().split(",") ,movie, "est");
-                addGenreToList(genres,data.getEngGenres().split(",") ,movie, "eng");
-                addGenreToList(genres,data.getRusGenres().split(",") ,movie, "rus");
+                addGenreToList(genres,data.getEstGenres().split(",") ,movie);
+                addGenreToList(genres,data.getEngGenres().split(",") ,movie);
+                addGenreToList(genres,data.getRusGenres().split(",") ,movie);
             }
         }
         genreRepository.saveAll(genres);
     }
 
-    private void addGenreToList (List<Genre> genres, String[] genresAsStrings, Movie movie, String lang) {
+    private void addGenreToList (List<Genre> genres, String[] genresAsStrings, Movie movie) {
         for (String description : genresAsStrings) {
             description = description.trim();
             description = description.substring(0, 1).toUpperCase() + description.substring(1);
             if (description.equalsIgnoreCase("фильм ужасов")) {
                 description = "Ужасы";
             }
-            genres.add(new Genre(description, movie, lang));
+            genres.add(new Genre(description, movie));
         }
     }
 
