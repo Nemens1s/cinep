@@ -1,5 +1,6 @@
 package cinep.app.cinep.security;
 
+import cinep.app.cinep.model.Movie;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -12,9 +13,9 @@ public class CinepUser extends User {
 
     private Long id;
     private Role role;
-    private Set<Long> bookmarks;
+    private Set<Movie> bookmarks;
 
-    public CinepUser(String username, String password, Collection<? extends GrantedAuthority> authorities, Role role, Long id, Set<Long> bookmarks) {
+    public CinepUser(String username, String password, Collection<? extends GrantedAuthority> authorities, Role role, Long id, Set<Movie> bookmarks) {
         super(username, password, authorities);
         this.role = role;
         this.id = id;

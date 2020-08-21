@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,11 +27,15 @@ public class User {
 
     private String username;
 
-    @ElementCollection(fetch=FetchType.LAZY)
-    @CollectionTable(name = "user_bookmarks", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "movie_id")
     @JsonIgnore
-    private Set<Long> bookmarks;
+    @ManyToMany(fetch = FetchType.LAZY ,cascade = {CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST})
+    @JoinTable(name = "user_bookmarks",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "movie_id") })
+    private Set<Movie> bookmarks = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private Role role;

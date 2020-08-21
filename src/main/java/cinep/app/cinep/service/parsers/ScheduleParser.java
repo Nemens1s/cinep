@@ -69,7 +69,7 @@ public class ScheduleParser {
                     if (startElement.getName().getLocalPart().equalsIgnoreCase("id")) {
                         xmlEvent = xmlEventReader.nextEvent();
                         movie.setId(Long.parseLong(xmlEvent.asCharacters().getData()));
-                    } else if (startElement.getName().getLocalPart().equalsIgnoreCase("OriginalTitle")) {
+                    } else if (startElement.getName().getLocalPart().equalsIgnoreCase("originaltitle")) {
                         xmlEvent = xmlEventReader.nextEvent();
                         movie.setOriginalTitle(xmlEvent.asCharacters().getData());
                     } else if (startElement.getName().getLocalPart().equalsIgnoreCase("theatre")) {

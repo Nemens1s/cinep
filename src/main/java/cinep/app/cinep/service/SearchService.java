@@ -3,7 +3,6 @@ package cinep.app.cinep.service;
 import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.repository.MovieRepository;
-import cinep.app.cinep.service.utilities.ObjectMapper;
 import cinep.app.cinep.specifications.MovieSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,9 +32,6 @@ public class SearchService {
                 pageable.getPageSize(), Sort.by("startDate").ascending().and(Sort.by("startTime").ascending()));
         return movieRepository.findAll(specification, pageable).map(MovieDto::new);
     }
-
-
-
 
     /*
     public List<MovieDto> findAllMovies() {

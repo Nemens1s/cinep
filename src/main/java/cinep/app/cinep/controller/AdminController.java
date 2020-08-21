@@ -7,6 +7,7 @@ import cinep.app.cinep.service.UserService;
 import cinep.app.cinep.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -15,12 +16,10 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final MovieService refresher;
-    private final UserService userService;
 
     @Autowired
-    public AdminController(MovieService refresher, UserService userService) {
+    public AdminController(MovieService refresher) {
         this.refresher = refresher;
-        this.userService = userService;
     }
 
     @GetMapping("/fetch")
@@ -35,8 +34,4 @@ public class AdminController {
         return HttpStatus.OK;
     }
 
-    @DeleteMapping("/delete/{username}")
-    public UserDto delete(@PathVariable String username) throws UserNotFoundException {
-        return userService.deleteUser(username);
-    }
 }

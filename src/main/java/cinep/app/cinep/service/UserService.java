@@ -1,68 +1,73 @@
 package cinep.app.cinep.service;
 
+import cinep.app.cinep.dto.LoginDetails;
+import cinep.app.cinep.dto.MovieDto;
 import cinep.app.cinep.dto.UserDto;
-import cinep.app.cinep.exceptions.MovieAlreadyInBookmarksException;
-import cinep.app.cinep.exceptions.MyBadRequestException;
-import cinep.app.cinep.exceptions.UserAlreadyInDatabaseException;
-import cinep.app.cinep.exceptions.UserNotFoundException;
+import cinep.app.cinep.exceptions.*;
 import cinep.app.cinep.model.Movie;
 import cinep.app.cinep.model.User;
 import cinep.app.cinep.repository.MovieRepository;
 import cinep.app.cinep.repository.UserRepository;
+import cinep.app.cinep.security.CinepUser;
+import cinep.app.cinep.security.CinepUserDetailsService;
+import cinep.app.cinep.security.JwtTokenProvider;
 import cinep.app.cinep.security.Role;
-import cinep.app.cinep.service.utilities.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService{
 
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder;
     private final MovieRepository movieRepository;
+    private final AuthenticationManager authenticationManager;
+    private final CinepUserDetailsService cinepUserDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
     @Autowired
-    public UserService(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder,
-                       MovieRepository movieRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       MovieRepository movieRepository, AuthenticationManager authenticationManager, CinepUserDetailsService cinepUserDetailsService, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
-        this.objectMapper = objectMapper;
         this.passwordEncoder = passwordEncoder;
         this.movieRepository = movieRepository;
+        this.authenticationManager = authenticationManager;
+        this.cinepUserDetailsService = cinepUserDetailsService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
 
-    public Set<Movie> getBookmarks(String username) throws UserNotFoundException {
+    public Set<MovieDto> getBookmarks(String username)  {
         User user = userRepository.findByUsername(username);
-        if (user == null){
-            throw new UserNotFoundException("There is no user with: " + username);
-        }
-        return fetchBookmarks(user.getBookmarks());
+        return user.getBookmarks().stream().map(MovieDto::new).collect(Collectors.toSet());
     }
 
-    public Set<Movie> addToBookmarks(Long movieId, String username) throws UserNotFoundException, MovieAlreadyInBookmarksException {
+    public Set<MovieDto> addToBookmarks(MovieDto movieDto, String username) throws  MovieAlreadyInBookmarksException {
         User user = userRepository.findByUsername(username);
-        if (user == null){
-            throw new UserNotFoundException("There is no user with: " + username);
+        Movie movie = movieRepository.findById(movieDto.getId()).orElseThrow(MyBadRequestException::new);
+        if (user.getBookmarks().contains(movie)) {
+            throw new MovieAlreadyInBookmarksException("This movie is already in bookmarks");
         }
-        if (user.getBookmarks().contains(movieId)){
-            throw new MovieAlreadyInBookmarksException("You already have this movie in your bookmarks");
-        }
-        user.getBookmarks().add(movieId);
+        user.getBookmarks().add(movie);
         userRepository.save(user);
-        return fetchBookmarks(user.getBookmarks());
+        return user.getBookmarks().stream().map(MovieDto::new).collect(Collectors.toSet());
     }
 
-    public Long removeBookmark(Long id, String username) {
+    public Set<MovieDto> removeBookmark(MovieDto movieDto, String username) {
         User user = userRepository.findByUsername(username);
-        user.getBookmarks().remove(id);
+        Movie movie = movieRepository.findById(movieDto.getId()).orElseThrow(MyBadRequestException::new);
+        user.getBookmarks().remove(movie);
         userRepository.save(user);
-        return id;
+        return user.getBookmarks().stream().map(MovieDto::new).collect(Collectors.toSet());
     }
 
     public HttpStatus register(UserDto userDto) throws UserAlreadyInDatabaseException {
@@ -76,28 +81,31 @@ public class UserService{
             throw new UserAlreadyInDatabaseException("There is already a user with username: " + userDto.getUsername());
         }
 
-        User user = objectMapper.convertDtoToUser(userDto);
+        User user = new User();
+        user.setUsername(userDto.getUsername());
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(user);
         return HttpStatus.CREATED;
     }
 
-    public UserDto deleteUser(String username) throws UserNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null){
-            throw new UserNotFoundException("User was not found");
+    public LoginDetails login (UserDto userDto) {
+        if (userDto.getUsername()== null) {
+            throw new MyBadRequestException();
         }
-        userRepository.delete(user);
-        return objectMapper.convertUserToDto(user);
+        if (userDto.getPassword() == null) {
+            throw new MyBadRequestException();
+        }
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
+        final UserDetails userDetails = cinepUserDetailsService.loadUserByUsername(userDto.getUsername());
+        final String token = jwtTokenProvider.generateToken(userDetails);
+        CinepUser cinepUser = (CinepUser) userDetails;
+        return new LoginDetails(cinepUser.getUsername(), token, cinepUser.getRole(),  toAuthorities(cinepUser));
     }
 
-    private Set<Movie> fetchBookmarks(Set<Long> movieIDs) {
-        Set<Movie> movies = new LinkedHashSet<>();
-        for (Long id : movieIDs) {
-            Optional<Movie> movie = movieRepository.findById(id);
-            movie.ifPresent(movies::add);
-        }
-        return movies;
+    private List<String> toAuthorities(CinepUser cinepUser) {
+        return cinepUser.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
     }
+
+
 }
